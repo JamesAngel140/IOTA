@@ -14,7 +14,7 @@ iotaApp.config(["$routeProvider", "$locationProvider", "$httpProvider", function
         templateUrl: 'pages/login.html',
         controller: 'mainCtrl'
     }).otherwise({
-        redirectTo: '/'
+        redirectTo: '/login'
     });
 }]);
 

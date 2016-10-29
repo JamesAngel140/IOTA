@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-<!--Load library scripts-->
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<!-- Load application specific scripts-->
-<script src="scripts/app.js"></script>
+<html lang="en-us" ng-app="iotaApp">
 <head>
     <meta charset="UTF-8">
     <title>IOTA</title>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container">
-    <div ng-app="iotaApp">
-    </div>
+<div class="container" ng-view>
 </div>
-
 </body>
+<!--Load library scripts-->
+<script src="//code.angularjs.org/1.4.9/angular.min.js"></script>
+<script src="//code.angularjs.org/1.4.9/angular-route.min.js"></script>
+<script src="//code.angularjs.org/1.4.9/angular-resource.min.js"></script>
+<!-- Load application specific scripts-->
+<script src="scripts/app.js"></script>
 </html>

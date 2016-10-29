@@ -10,7 +10,7 @@ iotaApp.config(["$routeProvider", "$locationProvider", "$httpProvider", function
     //================================================
     // Define all the routes
     //================================================
-    $routeProvider.when('/', {
+    $routeProvider.when('/login', {
         templateUrl: 'pages/login.html',
         controller: 'mainCtrl'
     }).otherwise({

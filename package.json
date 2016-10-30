@@ -9,6 +9,8 @@
   "author": "James Angel",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.14.0"
+    "bootstrap": "^3.3.7",
+    "express": "^4.14.0",
+    "jquery": "^3.1.1"
   }
 }

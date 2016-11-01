@@ -8,10 +8,53 @@
 </head>
 <body>
 <div class="container">
+    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="panel-title">Sign In</div>
+            </div>
+            <div style="padding-top:30px" class="panel-body">
+                <form id="loginform" class="form-horizontal" role="form">
+                    <div style="margin-bottom: 25px" class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input id="login-username" type="text" class="form-control" name="username" value=""
+                               placeholder="username or email">
+                    </div>
+                    <div style="margin-top:10px" class="form-group">
+                        <div class="col-sm-12 controls">
+                            <a id="btn-login" class="btn btn-success">Login </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <!--Load library scripts-->
 <script src="jquery/dist/jquery.min.js"></script>
-<!-- Load application specific scripts-->
-<script src="scripts/app.js"></script>
+<script>
+    $(document).ready(function(){
+
+        function login_success(result,status,xhr){
+            alert("login success");
+        }
+        function login_error(xhr,status,error){
+            alert("login error " + error);
+        }
+        function login(){
+            $("#loginbox").hide();
+            $.ajax({url:"/register", data:{loginname:$("#login-username").val()}, success:login_success, error:login_error, type:"POST" })
+        }
+
+        $("#btn-login").click(function() {
+            login();
+        });
+
+        $("#loginform").submit(function( event ) {
+            event.preventDefault();
+            login();
+        });
+    });
+</script>
 </html>

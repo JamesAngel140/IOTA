@@ -29,32 +29,69 @@
             </div>
         </div>
     </div>
+    <div id="header" style="display:none">
+        <span class="label label-default" id="user0"></span>
+        <span class="label label-primary" id="user1"></span>
+        <span class="label label-success" id="user2"></span>
+        <span class="label label-info" id="user3"></span>
+    </div>
 </div>
 </body>
 <!--Load library scripts-->
 <script src="jquery/dist/jquery.min.js"></script>
 <script>
-    $(document).ready(function(){
+    $(document).ready(function () {
 
-        function login_success(result,status,xhr){
+        function login_success(result, status, xhr) {
             alert("login success");
         }
-        function login_error(xhr,status,error){
+
+        function login_error(xhr, status, error) {
             alert("login error " + error);
         }
-        function login(){
-            $("#loginbox").hide();
-            $.ajax({url:"/register", data:{loginname:$("#login-username").val()}, success:login_success, error:login_error, type:"POST" })
+
+        function login() {
+            var data = {name: $("#login-username").val()};
+
+            //$.post("/register", JSON.stringify({loginname: $("#login-username").val()}), login_success);
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                url: '/register',
+                success: function (data) {
+                    console.log('success');
+                    console.log(JSON.stringify(data));
+                    $("#loginbox").hide();
+                    $("#header").show();
+                }
+            });
         }
 
-        $("#btn-login").click(function() {
+        $("#btn-login").click(function () {
             login();
         });
 
-        $("#loginform").submit(function( event ) {
+        $("#loginform").submit(function (event) {
             event.preventDefault();
             login();
         });
+
+        // every 5000 milliseconds (5 seconds) get the registered users from the server
+        setInterval(function(){
+            $.ajax({
+                type: 'GET',
+                url: '/users',
+                success: function (data) {
+                    console.log('success');
+                    console.log(JSON.stringify(data));
+                    var arr = data;
+                    data.forEach(function(user,index){
+                       $("#user" + index).html(user);
+                    });
+                }
+            });
+        }, 5000);
     });
 </script>
 </html>

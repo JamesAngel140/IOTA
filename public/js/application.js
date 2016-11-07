@@ -7,7 +7,7 @@ $(document).ready(function () {
         alert("login success");
 
         $("#loginbox").hide();
-        $("#header").show();
+        $("#users").show();
 
         // every 5000 milliseconds (5 seconds) get the registered users from the server
         setInterval(function(){
@@ -23,6 +23,12 @@ $(document).ready(function () {
                 }
             });
         }, 5000);
+
+        var html = [];
+        deck.forEach(function(item){
+            html.push('<li style="color:' + item.colour + '">' + item.shape + " " + item.colour + " " + item.number + "</li>");
+        });
+        $("#tiles").html(html.join("\n"));
     }
 
     function login_error(xhr, status, error) {

@@ -26,7 +26,7 @@ $(document).ready(function () {
 
         var html = [];
         deck.forEach(function(item){
-            html.push('<li style="color:' + item.colour + '">' + item.shape + " " + item.colour + " " + item.number + "</li>");
+            html.push('<li id="item.shape" style="color:' + item.colour + '">' + item.shape + " " + item.colour + " " + item.number + "</li>");
         });
         $("#tiles").html(html.join("\n"));
     }

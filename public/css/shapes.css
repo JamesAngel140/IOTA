@@ -1,0 +1,25 @@
+#tileback {
+    border-radius: 25px;
+    background: blue;
+    padding: 20px;
+    width: 200px;
+    height: 150px;
+}
+#square {
+    width: 100px;
+    height: 100px;
+}
+#circle {
+    width: 100px;
+    height: 100px;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+}
+#triangle{
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-bottom: 100px solid red;
+}

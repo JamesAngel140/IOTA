@@ -7,7 +7,7 @@ var grid = [];
 for (var x = 0; x < size; x++) {
     grid.push([]);
     for (var y = 0; y < size; y++) {
-        grid[x].push(" ");
+        grid[x].push(null);
     }
 };
 

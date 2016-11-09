@@ -10,7 +10,7 @@ var  shapes=["square", "circle", "triangle", "cross"],
 shapes.forEach(function(shape){
     colours.forEach(function(colour) {
         numbers.forEach(function (number) {
-            deck.push({shape: shape, colour: colour, number: number});
+            deck.push({shape: shape, colour: colour, number: number, type:"tile"});
         })
     })
 });

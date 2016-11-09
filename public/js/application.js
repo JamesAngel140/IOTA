@@ -35,14 +35,25 @@ $(document).ready(function () {
     // });
     // $("#tiles").html(html.join("\n"));
 
-    function ToTable(dataArray)
+    function gridToHtml(grid)
     {
         html = '<table>';
-        var len = dataArray.length;
-        for(var i = 0; i < len; i++){
+        for(var y = 0; y < grid.length; y++){
             html += '<tr>';
-            for(var key in dataArray[i]){
-                html += '<td>' + dataArray[i][key] + '</td>';
+            for(var x = 0; x < grid[y].length; x++){
+                if(grid[x][y] !== null){
+                    switch(grid[x][y].type){
+                        case "tile":
+                            html += '<td>' + tileToHtml(grid[x][y]) + '</td>';
+                            break;
+                        case "target":
+                            html += '<td>' + targetToHtml(grid[x][y],x,y) + '</td>';
+                            break;
+                    }
+
+                } else {
+                    html += '<td></td>'
+                }
             }
             html += '</tr>';
         }
@@ -50,12 +61,78 @@ $(document).ready(function () {
         return html;
     }
 
-    var item = deck[3];
-    grid[32][32] = '<div class="' + item.shape + '" style="background:' + item.colour + '"></div>';
-    item = deck[17];
-    grid[32][33] = '<div class="' + item.shape + '" style="background:' + item.colour + '"></div>';
-    var html = ToTable(grid);
+    function targetToHtml(tile, x, y){
+        var html = '<div class="target" data-x="' + x + '" data-y="' + y + '"></div>';
+        return html;
+    }
+
+    function tileToHtml(tile){
+        var html = '<div class="tileback"><span class="alignleft">'+
+            tile.number +
+            '</span><span class="alignright">' +
+            tile.number +
+            '</span><div style="clear: both;"></div><div class="shapeback"><div class="' +
+            tile.shape +
+            '" style="background:' +
+            tile.colour +
+            '"></div></div><span class="alignleft" style="color:' + tile.colour + '">' +
+            tile.number +
+            '</span><span class="alignright">' +
+            tile.number +
+            '</span><div style="clear: both;"></div></div>';
+        return html;
+    }
+
+    function addTargets(grid, x, y){
+        for(var a = x-1; a <= x+1; a++){
+            for(var b = y-1; b <= y+1; b++) {
+                if(grid[a][b] === null){
+                    grid[a][b] = {type:"target"};
+                }
+            }
+        }
+    }
+
+    function addTargetsToGrid(grid){
+        for(var x = 0; x < grid.length; x++){
+            html += '<tr>';
+            for(var y in grid[x]){
+                if(grid[x][y] !== null){
+                    switch(grid[x][y].type){
+                        case "tile":
+                            addTargets(grid,x,y);
+                            break;
+                        case "target":
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    // grid[32][32] = {type:"target"};
+    grid[32][32] = deck[4];
+    grid[32][33] = deck[17];
+    grid[31][32] = deck[50];
+
+    addTargetsToGrid(grid);
+
+    var html = gridToHtml(grid);
     $("#grid").html(html);
+
+    function targetClick(e){
+            var x = $(this).attr("data-x");
+            var y = $(this).attr("data-y");
+            console.log(x,y);
+            // $(this).addClass("targetSelected");
+            grid[x][y] = deck[5];
+        addTargetsToGrid(grid);
+        var html = gridToHtml(grid);
+            $("#grid").html(html);
+        $('.target').click(targetClick);
+    }
+
+    $('.target').click(targetClick);
 
     function login_error(xhr, status, error) {
         alert("login error " + error);

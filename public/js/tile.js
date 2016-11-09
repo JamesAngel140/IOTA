@@ -2,15 +2,17 @@
  * Created by James on 07/11/2016.
  */
 
-var item = {shape:["square", "circle", "triangle", "cross"], colour:["blue", "red", "green", "yellow"], number:["1", "2", "3", "4"], deck:[]};
+var  shapes=["square", "circle", "triangle", "cross"],
+    colours=["blue", "red", "green", "yellow"],
+    numbers=["1", "2", "3", "4"],
+    deck=[];
 
+shapes.forEach(function(shape){
+    colours.forEach(function(colour) {
+        numbers.forEach(function (number) {
+            deck.push({shape: shape, colour: colour, number: number});
+        })
+    })
+});
 
-for (var i = 0; len = item.shape.length, i < len; i++) {
-    for (var j = 0; len = item.colour.length, j < len; j++) {
-        for (var k = 0; len = item.number.length, k < len; k++) {
-            item.deck.push(item.shape[i] + " " + item.colour[j] + " " + item.number[k])
-        }
-    }
-}
-
-console.log(item.deck)
+console.log(deck);

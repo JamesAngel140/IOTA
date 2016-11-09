@@ -4,7 +4,7 @@
 $(document).ready(function () {
 
     function login_success(result, status, xhr) {
-        alert("login success");
+        // alert("login success");
 
         $("#loginbox").hide();
         $("#users").show();
@@ -24,12 +24,38 @@ $(document).ready(function () {
             });
         }, 5000);
 
-        var html = [];
-        deck.forEach(function(item){
-            html.push('<li id="item.shape" style="color:' + item.colour + '">' + item.shape + " " + item.colour + " " + item.number + "</li>");
-        });
-        $("#tiles").html(html.join("\n"));
     }
+
+    $("#loginbox").hide();
+    $("#users").hide();
+
+    // var html = [];
+    // deck.forEach(function(item){
+    //     html.push('<li><div class="' + item.shape + '" style="background:' + item.colour + '"></div></li>');
+    // });
+    // $("#tiles").html(html.join("\n"));
+
+    function ToTable(dataArray)
+    {
+        html = '<table>';
+        var len = dataArray.length;
+        for(var i = 0; i < len; i++){
+            html += '<tr>';
+            for(var key in dataArray[i]){
+                html += '<td>' + dataArray[i][key] + '</td>';
+            }
+            html += '</tr>';
+        }
+        html += '</table>';
+        return html;
+    }
+
+    var item = deck[3];
+    grid[32][32] = '<div class="' + item.shape + '" style="background:' + item.colour + '"></div>';
+    item = deck[17];
+    grid[32][33] = '<div class="' + item.shape + '" style="background:' + item.colour + '"></div>';
+    var html = ToTable(grid);
+    $("#grid").html(html);
 
     function login_error(xhr, status, error) {
         alert("login error " + error);

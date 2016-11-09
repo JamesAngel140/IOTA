@@ -1,22 +1,17 @@
 /**
  * Created by James on 08/11/2016.
  */
-function grid(size) {
-    this.size = 64
-}
+var size = 64;
+var grid = [];
 
-
-var cells = [];
-
-for (var x = 0; x < this.size; x++) {
-    var row = cells[x] = [];
-
-    for (var y = 0; y < this.size; y++) {
-        row.push(null);
+for (var x = 0; x < size; x++) {
+    grid.push([]);
+    for (var y = 0; y < size; y++) {
+        grid[x].push(" ");
     }
 };
 
-console.log(grid)
+// console.log(grid);
 
 //http://codepen.io/GreenSock/pen/dPZLEp
 //http://greensock.com/forums/topic/12047-sortable-grid-with-draggable-tiles-demo-put-contentimages-in-tiles/

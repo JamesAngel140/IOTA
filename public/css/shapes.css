@@ -10,6 +10,15 @@
     font-weight: bold;
     font-size: 110%;
 }
+.blank {
+    width: 125px;
+    height: 125px;
+    border: 2px white;
+    border-style: solid;
+    padding: 0px 2px 0px 22px;
+    margin: 1px;
+    background: white;
+}
 .target {
     width: 125px;
     height: 125px;
@@ -22,13 +31,13 @@
 .targetSelected {
     width: 125px;
     height: 125px;
-    border: 2px green;
+    border: 2px red;
     border-style: solid;
     padding: 0px 2px 0px 22px;
     margin: 1px;
     background: lightgray;
 }
-.tileback {
+.tile {
     width: 125px;
     height: 125px;
     border: 2px black;

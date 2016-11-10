@@ -180,13 +180,14 @@ $(document).ready(function () {
         var x = $(this).attr("data-x");
         var y = $(this).attr("data-y");
         console.log(x, y);
-        $(this).addClass("targetSelected");
         // grid[x][y] = deck[5];
 
         // swap item out of hand into grid
         if(handIndex === -1){
             return;
         }
+
+        $(this).addClass("targetSelected");
 
         grid[x][y] = hand[handIndex];
 

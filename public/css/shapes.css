@@ -1,60 +1,66 @@
+:root{
+    --fontSize: 130%;
+    --tileWidth: 125px;
+    --tileBorderWidth: 2px;
+}
+
 .alignleft {
-    /* float: left; */
     font-weight: bold;
-    font-size: 110%;
-    /* padding-left: 0px; */
+    font-size: var(--fontSize);
 }
 .alignright {
     float: right;
     padding-right: 25px;
     font-weight: bold;
-    font-size: 110%;
+    font-size: var(--fontSize);
 }
+
 .blank {
-    width: 125px;
-    height: 125px;
-    border: 2px white;
+    width: var(--tileWidth);
+    height: var(--tileWidth);
+    border: var(--tileBorderWidth) white;
     border-style: solid;
     padding: 0px 2px 0px 22px;
     margin: 1px;
     background: white;
 }
+
 .target {
-    width: 125px;
-    height: 125px;
-    border: 2px lightgrey;
+    width: var(--tileWidth);
+    height: var(--tileWidth);
+    border: var(--tileBorderWidth) lightgrey;
     border-style: solid;
     padding: 0px 2px 0px 22px;
     margin: 1px;
     background: lightgray;
 }
 .targetSelected {
-    width: 125px;
-    height: 125px;
-    border: 2px red;
+    width: var(--tileWidth);
+    height: var(--tileWidth);
+    border: var(--tileBorderWidth) red;
     border-style: solid;
     padding: 0px 2px 0px 22px;
     margin: 1px;
     background: lightgray;
 }
+
 .tile {
-    width: 125px;
-    height: 125px;
-    border: 2px black;
+    width: var(--tileWidth);
+    height: var(--tileWidth);
+    border: var(--tileBorderWidth) black;
     border-style: solid;
     border-radius: 3px;
     padding: 0px 2px 0px 22px;
     margin: 1px;
     box-shadow: 5px 5px 2px #888888;
 }
+
 .shapeback {
     width: 75px;
     height: 75px;
     padding: 12.5px;
     margin: 0px;
     background: black;
-    /*border: 2px black;*/
-    /*border-style: solid;*/
 }
 .square {
     width: 50px;
@@ -80,7 +86,6 @@
     border-radius: 5px;
     position: relative;
 }
-
 .cross:after {
     position: absolute;
     top: 0;

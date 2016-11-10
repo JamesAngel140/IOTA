@@ -23,17 +23,10 @@ $(document).ready(function () {
                 }
             });
         }, 5000);
-
     }
 
     $("#loginbox").hide();
     $("#users").hide();
-
-    // var html = [];
-    // deck.forEach(function(item){
-    //     html.push('<li><div class="' + item.shape + '" style="background:' + item.colour + '"></div></li>');
-    // });
-    // $("#tiles").html(html.join("\n"));
 
     function gridToHtml(grid) {
         html = '<table>';
@@ -98,7 +91,7 @@ $(document).ready(function () {
             tile.shape +
             '" style="background:' +
             tile.colour +
-            '"></div></div><span class="alignleft" style="color:' + tile.colour + '">' +
+            '"></div></div><span class="alignleft">' +
             tile.number +
             '</span><span class="alignright">' +
             tile.number +
@@ -159,11 +152,6 @@ $(document).ready(function () {
         }
     }
 
-    // grid[32][32] = {type:"target"};
-    // grid[32][32] = deck[4];
-    // grid[32][33] = deck[17];
-    // grid[31][32] = deck[50];
-
     grid[32][32] = {type: "target"};
 
     addTargetsToGrid(grid);
@@ -180,7 +168,6 @@ $(document).ready(function () {
         var x = $(this).attr("data-x");
         var y = $(this).attr("data-y");
         console.log(x, y);
-        // grid[x][y] = deck[5];
 
         // swap item out of hand into grid
         if(handIndex === -1){
@@ -210,16 +197,10 @@ $(document).ready(function () {
         if(handIndex !== -1){
             $('#x-1y' + handIndex).removeClass("targetSelected");
         }
-        // var x = $(this).attr("data-x");
         var y = $(this).attr("data-y");
         handIndex = y;
         console.log(x, y);
         $(this).addClass("targetSelected");
-        // grid[x][y] = deck[5];
-        // addTargetsToGrid(grid);
-        // var html = gridToHtml(grid);
-        // $("#grid").html(html);
-        // $('.target').click(targetClick);
     }
     $('#hand .tile').click(tileClick);
 
@@ -236,12 +217,6 @@ $(document).ready(function () {
             contentType: 'application/json',
             url: '/register',
             success: login_success
-            // success: function (data) {
-            //     console.log('success');
-            //     console.log(JSON.stringify(data));
-            //     $("#loginbox").hide();
-            //     $("#header").show();
-            // }
         });
     }
 

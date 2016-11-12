@@ -88,14 +88,27 @@ $(document).ready(function () {
             '</span><span class="alignright">' +
             tile.number +
             '</span><div style="clear: both;"></div><div class="shapeback"><div class="' +
-            tile.shape +
-            '" style="background:' +
-            tile.colour +
-            '"></div></div><span class="alignleft">' +
+            tile.shape + '"';
+
+        switch (tile.shape) {
+            case "square":
+            case "circle":
+            case "cross": {
+                html += 'style="background:' + tile.colour + '"';
+                break;
+            }
+            case "triangle": {
+                html += 'style="border-bottom-color:' + tile.colour + '"';
+                break;
+            }
+        }
+
+        html += '></div></div><span class="alignleft">' +
             tile.number +
             '</span><span class="alignright">' +
             tile.number +
             '</span><div style="clear: both;"></div></div>';
+
         return html;
     }
 
@@ -170,7 +183,7 @@ $(document).ready(function () {
         console.log(x, y);
 
         // swap item out of hand into grid
-        if(handIndex === -1){
+        if (handIndex === -1) {
             return;
         }
 
@@ -193,8 +206,9 @@ $(document).ready(function () {
     $('.target').click(targetClick);
 
     var handIndex = -1;
+
     function tileClick(e) {
-        if(handIndex !== -1){
+        if (handIndex !== -1) {
             $('#x-1y' + handIndex).removeClass("targetSelected");
         }
         var y = $(this).attr("data-y");
@@ -202,6 +216,7 @@ $(document).ready(function () {
         console.log(x, y);
         $(this).addClass("targetSelected");
     }
+
     $('#hand .tile').click(tileClick);
 
     function login_error(xhr, status, error) {

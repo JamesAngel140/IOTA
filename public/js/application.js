@@ -180,6 +180,9 @@ $(document).ready(function () {
     function targetClick(e) {
         var x = $(this).attr("data-x");
         var y = $(this).attr("data-y");
+        x = parseInt(x);
+        y = parseInt(y);
+
         console.log(x, y);
 
         // swap item out of hand into grid
@@ -187,9 +190,24 @@ $(document).ready(function () {
             return;
         }
 
-        $(this).addClass("targetSelected");
+        // count how many rulesAllValid are true
+        // all rulesAllValid must be valid
+        var allValidCount = 0;
+        rulesAllValid.forEach(function(rule){
+            allValidCount += rule(grid, hand[handIndex], x, y);
+        });
 
-        grid[x][y] = hand[handIndex];
+        var atLeastOneValidCount = 0;
+        rulesAtLeastOneValid.forEach(function(rule){
+            atLeastOneValidCount += rule(grid, hand[handIndex], x, y);
+        });
+
+        if(isGridEmpty(grid)|| ( allValidCount === rulesAllValid.length && atLeastOneValidCount >= 1)) {
+            grid[x][y] = hand[handIndex];
+        }else{
+            return; // return if we can not place tile in valid location
+        }
+        $(this).addClass("targetSelected");
 
         hand[handIndex] = {type: "blank"};
         var html = handToHtml(hand);

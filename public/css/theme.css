@@ -1,3 +1,6 @@
 .space{
     margin: 5px;
 }
+td, th {
+    padding: 2px;
+}

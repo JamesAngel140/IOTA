@@ -11,50 +11,18 @@ function isGridEmpty(grid) {
     }
     return 1;
 }
-
-var rulesAllValid = [];
-var ruleInEmptyLocation = function (grid, tile, x, y) {
-    if (grid[x][y] === null || grid[x][y].type !== "tile") {
-        return 1;
-    }
-    return 0;
-};
-rulesAllValid.push(ruleInEmptyLocation);
-
-var ruleNextToTile = function (grid, tile, x, y) {
-    if (grid[x - 1][y].type === "tile" ||
-        grid[x + 1][y].type === "tile" ||
-        grid[x][y - 1].type === "tile" ||
-        grid[x][y + 1].type === "tile") {
-        return 1;
-    }
-    return 0;
-};
-rulesAllValid.push(ruleNextToTile);
-
-// function pushTileToArray(tiles, obj){
-//     if(obj === null){
-//         return;
-//     } else if(obj !== "tile"){
-//         return;
-//     }
-//     tiles.push(obj);
-//     return tiles;
-// }
-
-var rulesAtLeastOneValid = [];
 var getVariables = function (grid, tile, x, y) {
     var xTiles = [];
     // start at x and go left
-    for (var a = x-1; a > x - 3; a--) {
-        if(grid[a][y] && grid[a][y].type !== "tile"){
+    for (var a = x - 1; a > x - 3; a--) {
+        if (grid[a][y] && grid[a][y].type !== "tile") {
             break;
         }
         xTiles.push(grid[a][y]);
     }
     // start at x and go right
-    for ( a = x+1; a < x + 3; a++) {
-        if(grid[a][y] && grid[a][y].type !== "tile"){
+    for (a = x + 1; a < x + 3; a++) {
+        if (grid[a][y] && grid[a][y].type !== "tile") {
             break;
         }
         xTiles.push(grid[a][y]);
@@ -64,15 +32,15 @@ var getVariables = function (grid, tile, x, y) {
 
     var yTiles = [];
     // start at y and go up
-    for ( a = y-1; a > y - 3; a--) {
-        if(grid[x][a] && grid[x][a].type !== "tile"){
+    for (a = y - 1; a > y - 3; a--) {
+        if (grid[x][a] && grid[x][a].type !== "tile") {
             break;
         }
         yTiles.push(grid[x][a]);
     }
     // start at x and go right
-    for ( a = y+1; a < y + 3; a++) {
-        if(grid[x][a] && grid[x][a].type !== "tile"){
+    for (a = y + 1; a < y + 3; a++) {
+        if (grid[x][a] && grid[x][a].type !== "tile") {
             break;
         }
         yTiles.push(grid[x][a]);
@@ -108,32 +76,109 @@ var getVariables = function (grid, tile, x, y) {
 
     return retVal;
 };
-var ruleNothingInCommon = function (grid, tile, x, y) {
-    var retVal = getVariables(grid, tile, x, y);
 
-    for (var j = 0; j < retVal.length; j++) {
-        if (!(
-            retVal[j].colours.length === retVal[j].count &&
-            retVal[j].shapes.length === retVal[j].count &&
-            retVal[j].numbers.length === retVal[j].count)) {
-            return 0;
-        }
+var rulesAllValid = [];
+
+var ruleInEmptyLocation = function (grid, tile, x, y) {
+    if (grid[x][y] === null || grid[x][y].type !== "tile") {
+        console.log("ruleInEmptyLocation true");
+        return 1;
     }
-    return 1;
+    console.log("ruleInEmptyLocation false");
+    return 0;
+};
+rulesAllValid.push(ruleInEmptyLocation);
+
+var ruleNextToTile = function (grid, tile, x, y) {
+    if ((grid[x - 1][y] && grid[x - 1][y].type === "tile") ||
+        (grid[x + 1][y] && grid[x + 1][y].type === "tile") ||
+        (grid[x][y - 1] && grid[x][y - 1].type === "tile") ||
+        (grid[x][y + 1] && grid[x][y + 1].type === "tile")) {
+        console.log("ruleNextToTile true");
+        return 1;
+    }
+    console.log("ruleNextToTile false");
+    return 0;
+};
+rulesAllValid.push(ruleNextToTile);
+
+var ruleNewTileInALine = function (grid, tile, x, y, previousTiles) {
+    var tiles = previousTiles.map(function(item){return item}); // copy list
+    tile.x = x;
+    tile.y = y;
+    tiles.push(tile);
+
+    var xs = [];
+    var ys = [];
+    tiles.forEach(function (item) {
+        if (xs.indexOf(item.x) === -1) {
+            xs.push(item.x);
+        }
+        if (ys.indexOf(item.y) === -1) {
+            ys.push(item.y);
+        }
+    });
+    console.log("ruleNewTileInALine", ys.length === 1 || xs.length === 1);
+    return ys.length === 1 || xs.length === 1
+};
+rulesAllValid.push(ruleNewTileInALine);
+
+var rulesAtLeastOneValid = [];
+
+var ruleNothingInCommon = function (grid, tile, x, y, index) {
+    var retVal = getVariables(grid, tile, x, y);
+    var axis = retVal[index];
+
+    var colours = axis.colours.length;
+    var shapes = axis.shapes.length;
+    var numbers = axis.numbers.length;
+    var count = axis.count;
+
+    var total = colours + shapes + numbers;
+
+    console.log("ruleNothingInCommon", index, total === count * 3);
+    return total === count * 3;
 };
 rulesAtLeastOneValid.push(ruleNothingInCommon);
 
-var ruleTwoTheSame = function (grid, tile, x, y) {
+var ruleOneTheSame = function (grid, tile, x, y, index) {
     var retVal = getVariables(grid, tile, x, y);
+    var axis = retVal[index];
 
-    for (var j = 0; j < retVal.length; j++) {
-        if (!(
-            retVal[j].colours.length === retVal[j].count &&
-            retVal[j].shapes.length === retVal[j].count &&
-            retVal[j].numbers.length === retVal[j].count)) {
+    var colours = axis.colours.length;
+    var shapes = axis.shapes.length;
+    var numbers = axis.numbers.length;
+    var count = axis.count;
+
+    if ((colours === 1 && shapes === count && numbers === count) ||
+        (colours === count && shapes === 1 && numbers === count) ||
+        (colours === count && shapes === count && numbers === 1)) {
+        console.log("ruleOneTheSame", index, true);
+        return 1;
+    } else {
+        console.log("ruleOneTheSame", index, false);
+        return 0;
+    }
+};
+rulesAtLeastOneValid.push(ruleOneTheSame);
+
+var ruleTwoTheSame = function (grid, tile, x, y, index) {
+    var retVal = getVariables(grid, tile, x, y);
+    var axis = retVal[index];
+
+        var colours = axis.colours.length;
+        var shapes = axis.shapes.length;
+        var numbers = axis.numbers.length;
+        var count = axis.count;
+
+        if ((colours === 1 && shapes === 1 && numbers === count) ||
+            (colours === 1 && shapes === count && numbers === 1) ||
+            (colours === count && shapes === 1 && numbers === 1)) {
+            console.log("ruleTwoTheSame", index, true);
+            return 1;
+        } else {
+            console.log("ruleTwoTheSame", index, false);
             return 0;
         }
-    }
-    return 1;
 };
 rulesAtLeastOneValid.push(ruleTwoTheSame);

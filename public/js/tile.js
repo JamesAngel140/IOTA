@@ -2,20 +2,23 @@
  * Created by James on 07/11/2016.
  */
 
-// Create the 3 variables of a tile
-var shapes=["square", "circle", "triangle", "cross"],
-    colours=["blue", "red", "green", "yellow"],
-    numbers=["1", "2", "3", "4"],
-    deck=[];
+function createDeck() {
+    // Create the 3 variables of a tile
+    var shapes=["square", "circle", "triangle", "cross"],
+        colours=["blue", "red", "green", "yellow"],
+        numbers=["1", "2", "3", "4"];
 
+    var deck = [];
 // using the variables above create a deck of cards
-shapes.forEach(function(shape){
-    colours.forEach(function(colour) {
-        numbers.forEach(function (number) {
-            deck.push({shape: shape, colour: colour, number: number, type:"tile"});
+    shapes.forEach(function (shape) {
+        colours.forEach(function (colour) {
+            numbers.forEach(function (number) {
+                deck.push({shape: shape, colour: colour, number: number, type: "tile"});
+            })
         })
-    })
-});
+    });
+    return deck;
+}
 
 // The Fisher-Yates (aka Knuth) Shuffle.
 // See https://github.com/coolaj86/knuth-shuffle
@@ -38,14 +41,11 @@ function shuffle(array) {
     return array;
 }
 
-// shuffle the deck so that it has a random order
-deck = shuffle(deck);
-//console.log(deck);
+function dealHand(deck){
+    var hand = [];
 
-var hand = [];
-
-function dealHand(){
     for(var i = 0; i < 4; i++){
         hand.push(deck.pop());
     }
+    return hand;
 }

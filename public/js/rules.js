@@ -182,3 +182,25 @@ var ruleTwoTheSame = function (grid, tile, x, y, index) {
         }
 };
 rulesAtLeastOneValid.push(ruleTwoTheSame);
+
+
+function isValidMove(grid, newTile, x, y, tilesPlaced){
+    // count how many rulesAllValid are true
+    // all rulesAllValid must be valid
+    var allValidCount = 0;
+    rulesAllValid.forEach(function(rule){
+        allValidCount += rule(grid, newTile, x, y, tilesPlaced);
+    });
+
+    // one or more of at least one needs to be valid
+    var atLeastOneValidCountX = 0;
+    rulesAtLeastOneValid.forEach(function(rule){
+        atLeastOneValidCountX += rule(grid, newTile, x, y, 0);
+    });
+    var atLeastOneValidCountY = 0;
+    rulesAtLeastOneValid.forEach(function(rule){
+        atLeastOneValidCountY += rule(grid, newTile, x, y, 1);
+    });
+
+    return  allValidCount === rulesAllValid.length && atLeastOneValidCountX >= 1 && atLeastOneValidCountY >= 1;
+};

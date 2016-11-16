@@ -189,24 +189,9 @@ $(document).ready(function () {
             return;
         }
 
-        // count how many rulesAllValid are true
-        // all rulesAllValid must be valid
-        var allValidCount = 0;
-        rulesAllValid.forEach(function(rule){
-            allValidCount += rule(grid, hand[handIndex], x, y, tilesPlaced);
-        });
+        var validMove= isValidMove(grid, hand[handIndex], x, y, tilesPlaced);
 
-        // one or more of at least one needs to be valid
-        var atLeastOneValidCountX = 0;
-        rulesAtLeastOneValid.forEach(function(rule){
-            atLeastOneValidCountX += rule(grid, hand[handIndex], x, y, 0);
-        });
-        var atLeastOneValidCountY = 0;
-        rulesAtLeastOneValid.forEach(function(rule){
-            atLeastOneValidCountY += rule(grid, hand[handIndex], x, y, 1);
-        });
-
-        if(isGridEmpty(grid)|| ( allValidCount === rulesAllValid.length && atLeastOneValidCountX >= 1 && atLeastOneValidCountY >= 1)) {
+        if(isGridEmpty(grid)|| validMove) {
             $(this).addClass("targetSelected");
 
             // keep history before the change
@@ -288,28 +273,87 @@ $(document).ready(function () {
     }
     $("#reset").click(resetClick);
 
-    function nextClick(e){
+    function endClick(e){
         history = [];
-        hand = dealHand(deck);
-        buildDesktop(grid, hand);
+        handIndex = -1;
+        tilesPlaced = []
+
+        var data = {
+            grid: prepareGrid(clone(grid)),
+            hand: hand,
+            name: "James"
+        };
+
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/grid',
+            success: function (message) {
+                console.log('grid post success');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/user/' + "James" + '/hand',
+                    success: function (message) {
+                        console.log('user hand success');
+                        //console.log(message);
+
+                        hand = JSON.parse(message);
+
+                        //$("#end").hide();
+
+                        buildDesktop(grid, hand);
+                    }
+                });
+
+            }
+        });
     }
-    $("#next").click(nextClick);
+    $("#end").click(endClick);
 
     // this is where we start
     var history = [];
     var tilesPlaced = [];
     var handIndex = -1;
 
-    var deck = createDeck();
+    //var deck = createDeck();
     // shuffle the deck so that it has a random order
-    deck = shuffle(deck);
+    //deck = shuffle(deck);
 
-    var grid = createGrid();
+    var grid = null;
+    var hand = null;
+
+    $.ajax({
+        type: 'GET',
+        url: '/grid',
+        success: function (message) {
+            console.log('grid success');
+            //console.log(message);
+
+            grid = JSON.parse(message);
+            addBlanksToGrid(grid);
+
+            $.ajax({
+                type: 'GET',
+                url: '/user/' + "James" + '/hand',
+                success: function (message) {
+                    console.log('user hand success');
+                    //console.log(message);
+
+                    hand = JSON.parse(message);
+
+                    $("#end").show();
+
+                    buildDesktop(grid, hand);
+                }
+            });
+        }
+    });
+
+    //var grid = createGrid();
     //grid[32][32] = {type: "target"};
-    grid[32][32] = deck.pop();
-    grid[33][32] = deck.pop();
-    addBlanksToGrid(grid);
+    //grid[32][32] = deck.pop();
 
-    var hand = dealHand(deck);
-    buildDesktop(grid, hand);
+    //var hand = dealHand(deck);
 });

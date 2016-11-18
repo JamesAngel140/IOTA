@@ -150,9 +150,9 @@ var ruleOneTheSame = function (grid, tile, x, y, index) {
     var numbers = axis.numbers.length;
     var count = axis.count;
 
-    if ((colours === 1 && shapes === count && numbers === count) ||
-        (colours === count && shapes === 1 && numbers === count) ||
-        (colours === count && shapes === count && numbers === 1)) {
+    if ((colours === 1 && shapes > 1 && numbers > 1 ) ||
+        (colours > 1 && shapes === 1 && numbers > 1 ) ||
+        (colours > 1 && shapes > 1 && numbers === 1)) {
         console.log("ruleOneTheSame", index, true);
         return 1;
     } else {
@@ -183,16 +183,14 @@ var ruleTwoTheSame = function (grid, tile, x, y, index) {
 };
 rulesAtLeastOneValid.push(ruleTwoTheSame);
 
-
 function isValidMove(grid, newTile, x, y, tilesPlaced){
-    // count how many rulesAllValid are true
     // all rulesAllValid must be valid
     var allValidCount = 0;
     rulesAllValid.forEach(function(rule){
         allValidCount += rule(grid, newTile, x, y, tilesPlaced);
     });
 
-    // one or more of at least one needs to be valid
+    // one or more of rulesAtLeastOne needs to be valid in x and y direction
     var atLeastOneValidCountX = 0;
     rulesAtLeastOneValid.forEach(function(rule){
         atLeastOneValidCountX += rule(grid, newTile, x, y, 0);

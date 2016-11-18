@@ -16,14 +16,14 @@ var getVariables = function (grid, tile, x, y) {
     // start at x and go left
     for (var a = x - 1; a > x - 3; a--) {
         if (grid[a][y] && grid[a][y].type !== "tile") {
-            break;
+            continue;
         }
         xTiles.push(grid[a][y]);
     }
     // start at x and go right
     for (a = x + 1; a < x + 3; a++) {
         if (grid[a][y] && grid[a][y].type !== "tile") {
-            break;
+            continue;
         }
         xTiles.push(grid[a][y]);
     }
@@ -34,14 +34,14 @@ var getVariables = function (grid, tile, x, y) {
     // start at y and go up
     for (a = y - 1; a > y - 3; a--) {
         if (grid[x][a] && grid[x][a].type !== "tile") {
-            break;
+            continue;
         }
         yTiles.push(grid[x][a]);
     }
     // start at x and go right
     for (a = y + 1; a < y + 3; a++) {
         if (grid[x][a] && grid[x][a].type !== "tile") {
-            break;
+            continue;
         }
         yTiles.push(grid[x][a]);
     }
@@ -134,10 +134,13 @@ var ruleNothingInCommon = function (grid, tile, x, y, index) {
     var numbers = axis.numbers.length;
     var count = axis.count;
 
-    var total = colours + shapes + numbers;
-
-    console.log("ruleNothingInCommon", index, total === count * 3);
-    return total === count * 3;
+    if (colours === count && shapes === count && numbers === count ) {
+        console.log("ruleNothingInCommon", index, true);
+        return 1;
+    } else {
+        console.log("ruleNothingInCommon", index, false);
+        return 0;
+    }
 };
 rulesAtLeastOneValid.push(ruleNothingInCommon);
 
@@ -171,9 +174,9 @@ var ruleTwoTheSame = function (grid, tile, x, y, index) {
         var numbers = axis.numbers.length;
         var count = axis.count;
 
-        if ((colours === 1 && shapes === 1 && numbers === count) ||
-            (colours === 1 && shapes === count && numbers === 1) ||
-            (colours === count && shapes === 1 && numbers === 1)) {
+        if ((colours === 1 && shapes === 1 && numbers > 1) ||
+            (colours === 1 && shapes > 1 && numbers === 1) ||
+            (colours > 1 && shapes === 1 && numbers === 1)) {
             console.log("ruleTwoTheSame", index, true);
             return 1;
         } else {

@@ -1,18 +1,22 @@
 :root{
     --fontSize: 130%;
-    --tileWidth: 125px;
+    --tileWidth: 90px;
     --tileBorderWidth: 2px;
+    --shapeBackWidth: 50px;
+    --shapeWidth: 40px;
+    --shapeHalfWidth: 20px;
 }
 
 .alignleft {
     font-weight: bold;
     font-size: var(--fontSize);
+    padding: 0px 0px 0px 2px;
 }
 .alignright {
     float: right;
-    padding-right: 25px;
     font-weight: bold;
     font-size: var(--fontSize);
+    padding: 0px 2px 0px 0px;
 }
 
 .blank {
@@ -20,7 +24,6 @@
     height: var(--tileWidth);
     border: var(--tileBorderWidth) white;
     border-style: solid;
-    padding: 0px 2px 0px 22px;
     margin: 1px;
     background: white;
 }
@@ -30,16 +33,15 @@
     height: var(--tileWidth);
     border: var(--tileBorderWidth) lightgrey;
     border-style: solid;
-    padding: 0px 2px 0px 22px;
     margin: 1px;
     background: lightgray;
 }
+
 .targetSelected {
     width: var(--tileWidth);
     height: var(--tileWidth);
     border: var(--tileBorderWidth) red;
     border-style: solid;
-    padding: 0px 2px 0px 22px;
     margin: 1px;
     background: lightgray;
 }
@@ -49,50 +51,57 @@
     height: var(--tileWidth);
     border: var(--tileBorderWidth) black;
     border-style: solid;
-    border-radius: 3px;
-    padding: 0px 2px 0px 22px;
+    border-radius: 5px;
     margin: 1px;
     box-shadow: 5px 5px 2px #888888;
 }
 
+.tileInner {
+    padding: 0px 2px 0px 18px;
+    margin: -7px -0px -5px 0px;
+}
+
 .shapeback {
-    width: 75px;
-    height: 75px;
-    padding: 12.5px;
+    width: var(--shapeBackWidth);
+    height: var(--shapeBackWidth);
+    padding: 5px;
     margin: 0px;
     background: black;
 }
+
 .square {
-    width: 50px;
-    height: 50px;
+    width: var(--shapeWidth);
+    height: var(--shapeWidth);
 }
 .circle {
-    width: 50px;
-    height: 50px;
-    -moz-border-radius: 25px;
-    -webkit-border-radius: 25px;
-    border-radius: 25px;
+    width: var(--shapeWidth);
+    height: var(--shapeWidth);
+    -moz-border-radius: var(--shapeHalfWidth);
+    -webkit-border-radius: var(--shapeHalfWidth);
+    border-radius: var(--shapeHalfWidth);
 }
 .triangle{
     width: 0;
     height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-bottom-width: 50px;
+    border-left: var(--shapeHalfWidth) solid transparent;
+    border-right: var(--shapeHalfWidth) solid transparent;
+    border-bottom-width: var(--shapeWidth);
     border-bottom-style: solid;
 }
+
 .cross {
-    height: 50px;
+    height: var(--shapeWidth);
     position: relative;
-    margin-left: 20px;
+    margin-left: 15px;
     width: 10px;
 }
+
 .cross:after {
     background-color: inherit;
     content: "";
     height: 10px;
-    left: -20px;
+    left: -15px;
     position: absolute;
-    top: 20px;
-    width: 50px;
+    top: 15px;
+    width: var(--shapeWidth);
 }

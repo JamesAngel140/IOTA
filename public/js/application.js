@@ -156,6 +156,19 @@ $(document).ready(function () {
         handIndex = y;
         console.log("tile index", y);
         $(this).addClass("targetSelected");
+
+
+        // tbd - this needs to be slected with a help button
+        addTargetsToGrid(grid);
+        for (var x = 0; x < size; x++) {
+            for (var y = 0; y < size; y++) {
+                if (grid[x][y] && grid[x][y].type === "target" && !isValidMove(grid, hand[handIndex], x, y, tilesPlaced)){
+                    grid[x][y] = {type:"blank"};
+                }
+            }
+        }
+        $("#grid").html(gridToHtml(grid));
+        $('#grid .target').click(targetClick);
     }
 
     function buildDesktop(grid, hand){

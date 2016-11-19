@@ -14,36 +14,32 @@ function isGridEmpty(grid) {
 var getVariables = function (grid, tile, x, y) {
     var xTiles = [];
     // start at x and go left
-    for (var a = x - 1; a > x - 3; a--) {
-        if (grid[a][y] && grid[a][y].type !== "tile") {
-            continue;
-        }
+    var a = x - 1;
+    while(a > x - 3 && grid[a][y] && grid[a][y].type === "tile"){
         xTiles.push(grid[a][y]);
+        a--;
     }
     // start at x and go right
-    for (a = x + 1; a < x + 3; a++) {
-        if (grid[a][y] && grid[a][y].type !== "tile") {
-            continue;
-        }
+    a = x + 1;
+    while(a < x + 3 && grid[a][y] && grid[a][y].type === "tile"){
         xTiles.push(grid[a][y]);
+        a++;
     }
     // add the tile to be inserted
     xTiles.push(tile);
 
     var yTiles = [];
     // start at y and go up
-    for (a = y - 1; a > y - 3; a--) {
-        if (grid[x][a] && grid[x][a].type !== "tile") {
-            continue;
-        }
+    a = y - 1;
+    while(a > y - 3 && grid[x][a] && grid[x][a].type === "tile"){
         yTiles.push(grid[x][a]);
+        a--;
     }
-    // start at x and go right
-    for (a = y + 1; a < y + 3; a++) {
-        if (grid[x][a] && grid[x][a].type !== "tile") {
-            continue;
-        }
+    // start at y and go down
+    a = y + 1;
+    while(a < y + 3 && grid[x][a] && grid[x][a].type === "tile"){
         yTiles.push(grid[x][a]);
+        a++;
     }
     // add the tile to be inserted
     yTiles.push(tile);
@@ -134,7 +130,9 @@ var ruleNothingInCommon = function (grid, tile, x, y, index) {
     var numbers = axis.numbers.length;
     var count = axis.count;
 
-    if (colours === count && shapes === count && numbers === count ) {
+    if (colours === count &&
+        shapes === count &&
+        numbers === count ) {
         console.log("ruleNothingInCommon", index, true);
         return 1;
     } else {
@@ -153,9 +151,9 @@ var ruleOneTheSame = function (grid, tile, x, y, index) {
     var numbers = axis.numbers.length;
     var count = axis.count;
 
-    if ((colours === 1 && shapes > 1 && numbers > 1 ) ||
-        (colours > 1 && shapes === 1 && numbers > 1 ) ||
-        (colours > 1 && shapes > 1 && numbers === 1)) {
+    if ((colours === 1 && shapes === count && numbers === count ) ||
+        (colours === count && shapes === 1 && numbers === count ) ||
+        (colours === count && shapes === count && numbers === 1)) {
         console.log("ruleOneTheSame", index, true);
         return 1;
     } else {
@@ -174,9 +172,9 @@ var ruleTwoTheSame = function (grid, tile, x, y, index) {
         var numbers = axis.numbers.length;
         var count = axis.count;
 
-        if ((colours === 1 && shapes === 1 && numbers > 1) ||
-            (colours === 1 && shapes > 1 && numbers === 1) ||
-            (colours > 1 && shapes === 1 && numbers === 1)) {
+        if ((colours === 1 && shapes === 1 && numbers === count) ||
+            (colours === 1 && shapes === count && numbers === 1) ||
+            (colours === count && shapes === 1 && numbers === 1)) {
             console.log("ruleTwoTheSame", index, true);
             return 1;
         } else {

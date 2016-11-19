@@ -21,31 +21,34 @@ function blankToHtml() {
     return html;
 }
 function tileToHtml(tile, x, y) {
-    var html = '<div id="x' + x + 'y' + y + '" class="tile" data-x="' + x + '" data-y="' + y + '"><span class="alignleft">' +
-        tile.number +
-        '</span><span class="alignright">' +
-        tile.number +
-        '</span><div style="clear: both;"></div><div class="shapeback"><div class="' +
-        tile.shape + '"';
+    var html = '<div id="x' + x + 'y' + y + '" class="tile" data-x="' + x + '" data-y="' + y + '">' +
+        '<span class="alignleft">' + tile.number + '</span>' +
+        '<span class="alignright">' + tile.number + '</span>' +
+        '<div style="clear: both;">' + '</div>' +
+        '<div class="tileInner">' +
+        '<div class="shapeback">';
 
+    html += '<div class="' + tile.shape + '"';
     switch (tile.shape) {
         case "square":
         case "circle":
         case "cross": {
-            html += 'style="background:' + tile.colour + '"';
+            html += 'style="background:' + tile.colour + '">';
             break;
         }
         case "triangle": {
-            html += 'style="border-bottom-color:' + tile.colour + '"';
+            html += 'style="border-bottom-color:' + tile.colour + '">';
             break;
         }
     }
+    html += '</div>';
 
-    html += '></div></div><span class="alignleft">' +
-        tile.number +
-        '</span><span class="alignright">' +
-        tile.number +
-        '</span><div style="clear: both;"></div></div>';
+    html += '</div>'+
+        '</div>' +
+        '<span class="alignleft">' + tile.number + '</span>' +
+        '<span class="alignright">' + tile.number + '</span>' +
+        '<div style="clear: both;"></div>' +
+        '</div>';
 
     return html;
 }

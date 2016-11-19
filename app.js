@@ -8,8 +8,7 @@ var express = require('express'),
     bodyParser = require("body-parser"),
     path = require('path');
 
-// global variable of users
-var registeredUsers = [];
+
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({
@@ -21,13 +20,27 @@ app.use(express.static('public'));
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
-app.post('/register', function (req, res) {
+app.post('/newGame', function (req, res) {
     console.log('body: ' + JSON.stringify(req.body));
 
     if (typeof req.body === 'undefined' || typeof req.body.name === 'undefined') {
         res.sendStatus(400);
     } else {
-        registeredUsers.push(req.body.name);
+        init();
+        global.users[req.body.name] = {hand: dealHand(global.deck)};
+        res.sendStatus(200);
+    }
+    console.log(registeredUsers);
+});
+app.post('/joinGame', function (req, res) {
+    console.log('body: ' + JSON.stringify(req.body));
+
+    if (typeof req.body === 'undefined' || typeof req.body.name === 'undefined') {
+        res.sendStatus(400);
+    } else {
+        if(!global.users[req.body.name]) {
+            global.users[req.body.name] = {hand: dealHand(global.deck)};
+        }
         res.sendStatus(200);
     }
     console.log(registeredUsers);
@@ -38,12 +51,12 @@ app.get('/users', function (req, res) {
 });
 // Grid functions
 app.get('/grid', function(req,res) {
-    var message = JSON.stringify(grid);
+    var message = JSON.stringify(global.grid);
     res.send(message);
 });
 // this is the end of the users turn
 app.post('/grid', function (req, res) {
-    console.log('body: ' + JSON.stringify(req.body));
+    //console.log('body: ' + JSON.stringify(req.body));
 
     if (typeof req.body === 'undefined' ||
         typeof req.body.grid === 'undefined' ||
@@ -51,8 +64,8 @@ app.post('/grid', function (req, res) {
         typeof req.body.name === 'undefined' ) {
         res.sendStatus(400); // error status
     } else {
-        grid = req.body.grid;
-        user[req.body.name].hand = refreshHand(req.body.hand, deck);
+        global.grid = req.body.grid;
+        global.users[req.body.name].hand = refreshHand(req.body.hand, global.deck);
         res.sendStatus(200); // success status
     }
 });
@@ -132,21 +145,19 @@ function refreshHand(hand, deck){
 app.get('/user/:name/hand', function(req,res) {
     var name= req.params.name;
     console.log(name);
-    var hand = user[name].hand;
+    var hand = global.users[name].hand;
     var message = JSON.stringify(hand);
     res.send(message);
 });
-var grid = createGrid();
 
-var deck = createDeck();
-deck = shuffle(deck);
-
-grid[32][32] = deck.pop();
-
-var user = {};
-user["James"] = {hand: dealHand(deck)};
-
-
+var global = {};
+function init(){
+    global.grid = createGrid();
+    global.deck = createDeck();
+    global.deck = shuffle(global.deck);
+    global.grid[32][32] = global.deck.pop();
+    global.users = {};
+}
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!');
 });

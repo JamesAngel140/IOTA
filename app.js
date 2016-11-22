@@ -8,6 +8,8 @@ var express = require('express'),
     bodyParser = require("body-parser"),
     path = require('path');
 
+var cfenv = require('cfenv');
+
 // global variable of users
 var registeredUsers = [];
 
@@ -146,7 +148,15 @@ grid[32][32] = deck.pop();
 var user = {};
 user["James"] = {hand: dealHand(deck)};
 
+//app.listen(3000, function () {
+//    console.log('Example app listening on port 3000!');
+//});
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
+// get the app environment from Cloud Foundry
+var appEnv = cfenv.getAppEnv();
+
+// start server on the specified port and binding host
+app.listen(appEnv.port, '0.0.0.0', function() {
+  // print a message when the server starts listening
+  console.log("server starting on " + appEnv.url);
 });

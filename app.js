@@ -16,31 +16,154 @@ app.use(bodyParser.json());
 app.use(express.static('node_modules'));
 app.use(express.static('public'));
 
+function user(name){
+    this.name = name;
+    this.hand = [];
+    this.score = 0;
+    this.turn = false;
+}
+function userManager() {
+    this.users = [];
+    this.mode = null;
+
+    this.getUser = function(name){
+        for(var i=0; i < this.users.length; i++){
+            if(this.users[i].name === name) {
+                return this.users[i];
+            }
+        }
+        return null;
+    };
+
+    this.createUser = function (name) {
+        if (this.getUser(name) !== null) {
+            return false; // if the user already exists return false, can not override an existing user
+        }
+        this.users.push(new user(name));
+        return true;
+    };
+
+    this.getNextUser = function(name){
+        if(this.getUser(name) === null){
+            return null;
+        }
+
+        for(var i=0; i < this.users.length; i++){
+            if(this.users[i].name === name) {
+                if(i === this.users.length - 1){
+                    return this.users[0];
+                } else {
+                    return this.users[i+1];
+                }
+            }
+        }
+    };
+
+    this.getFirstTurnUser = function(){
+        if(this.users.length === 0){
+            return null;
+        }
+        var user = this.users[Math.floor(Math.random()*this.users.length)];
+        return user;
+    };
+
+    this.forAllUsers = function(func){
+        for(var i=0; i < this.users.length; i++){
+            func(user);
+        }
+    }
+}
+function gameManager(userManager){
+    this.grid = null;
+    this.deck = null;
+    this.deck = null;
+    this.userManager = userManager;
+    this.startedBy = null;
+
+    this.start = function(name){
+        this.startedBy = name;
+        this.grid = createGrid();
+        this.deck = createDeck();
+        this.deck = shuffle(this.deck);
+
+        // dealing first card onto the grid
+        this.grid[32][32] = this.deck.pop();
+
+        // deal hands
+        var deck = this.deck; // temp var for the function below
+        this.userManager.forAllUsers(function(user){
+            user.hand = dealHand(deck);
+        });
+        // this.userManager.forAllUsers(function(user){
+        //     console.log(user);
+        // });
+        var user = this.userManager.getFirstTurnUser();
+        if(user === null){
+            return false;
+        }
+        user.turn = true;
+
+        return true;
+    };
+
+    this.endTurn = function(name){
+        var user = this.userManager.getUser(name);
+        if(user === null ){
+            console.log("User ", name, " does no exist");
+            return false; // user does not exist
+        }
+        if(user.turn === false){
+            console.log("User ", name, " is not their turn");
+            return false; // not the users turn
+        }
+        // now handle the turn logic
+        user.turn = false;
+        user.hand = refreshHand(user.hand,this.deck);
+        this.userManager.getNextUser(name).turn = true;
+    }
+}
+
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 app.post('/newGame', function (req, res) {
-    console.log('body: ' + JSON.stringify(req.body));
 
     if (typeof req.body === 'undefined' || typeof req.body.name === 'undefined') {
         res.sendStatus(400);
     } else {
-        init();
-        global.users[req.body.name] = {hand: dealHand(global.deck), turn: false};
-        res.sendStatus(200);
+        global.userManager = new userManager;
+        if(!global.userManager.createUser(req.body.name)){
+            res.sendStatus(400);
+        } else {
+            global.gameManager = new gameManager(global.userManager);
+            res.sendStatus(200);
+        }
     }
     console.log('newGame');
 });
 app.post('/joinGame', function (req, res) {
-    console.log('body: ' + JSON.stringify(req.body));
 
     if (typeof req.body === 'undefined' || typeof req.body.name === 'undefined') {
         res.sendStatus(400);
     } else {
-        if(!global.users[req.body.name]) {
-            global.users[req.body.name] = {hand: dealHand(global.deck)};
+        if(!global.userManager || !global.userManager.createUser(req.body.name)){
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(200);
         }
-        res.sendStatus(200);
+    }
+    console.log('joinGame');
+});
+app.post('/startGame', function (req, res) {
+
+    if (typeof req.body === 'undefined' || typeof req.body.name === 'undefined') {
+        res.sendStatus(400);
+    } else {
+        if(!global.gameManager.start(req.body.name)){
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(200);
+        }
     }
     console.log('joinGame');
 });
@@ -50,23 +173,31 @@ app.get('/users', function (req, res) {
 });
 // Grid functions
 app.get('/grid', function(req,res) {
-    var message = JSON.stringify(global.grid);
+    var message = JSON.stringify(global.gameManager.grid);
     res.send(message);
 });
 // this is the end of the users turn
-app.post('/grid', function (req, res) {
-    //console.log('body: ' + JSON.stringify(req.body));
-
+app.post('/endTurn', function (req, res) {
     if (typeof req.body === 'undefined' ||
         typeof req.body.grid === 'undefined' ||
         typeof req.body.hand === 'undefined' ||
         typeof req.body.name === 'undefined' ) {
         res.sendStatus(400); // error status
-    } else {
-        global.grid = req.body.grid;
-        global.users[req.body.name].hand = refreshHand(req.body.hand, global.deck);
-        res.sendStatus(200); // success status
+        return;
     }
+
+    var user = global.userManager.getUser(req.body.name);
+    if(!user){
+        res.sendStatus(400);
+        return;
+    }
+
+    if(!global.gameManager.endTurn(req.body.name)){
+        res.sendStatus(400);
+        return;
+    }
+    global.gameManager.grid = req.body.grid;
+    res.sendStatus(200); // success status
 });
 function createGrid() {
     var size = 64;
@@ -144,144 +275,38 @@ function refreshHand(hand, deck){
 app.get('/user/:name/hand', function(req,res) {
     var name= req.params.name;
     console.log(name);
-    var hand = global.users[name].hand;
+    var user = global.gameManager.userManager.getUser();
+    if(!user){
+        res.sendStatus(400); // fail status
+        return;
+    }
+
+    var hand = user.hand;
     var message = JSON.stringify(hand);
     res.send(message);
 });
 
-function user(name){
-    this.name = name;
-    this.hand = [];
-    this.score = 0;
-    this.turn = false;
-}
-// create user manager
-function userManager(mode) {
-    this.users = [];
-    this.mode = mode;
-
-    this.getUser = function(name){
-        for(var i=0; i < this.users.length; i++){
-            if(this.users[i].name === name) {
-                return this.users[i];
-            }
-        }
-        return null;
-    };
-
-    this.createUser = function (name) {
-        if (this.getUser(name) !== null) {
-            return false; // if the user already exists return false, can not override an existing user
-        }
-        this.users.push(new user(name));
-        return true;
-    };
-
-    this.getNextUser = function(name){
-        if(this.getUser(name) === null){
-            return null;
-        }
-
-        for(var i=0; i < this.users.length; i++){
-            if(this.users[i].name === name) {
-                if(i === this.users.length - 1){
-                    return this.users[0];
-                } else {
-                    return this.users[i+1];
-                }
-            }
-        }
-    };
-
-    this.getFirstTurnUser = function(){
-        if(this.users.length === 0){
-            return null;
-        }
-        var user = this.users[Math.floor(Math.random()*this.users.length)];
-        return user;
-    };
-
-    this.forAllUsers = function(func){
-        for(var i=0; i < this.users.length; i++){
-            func(user);
-        }
-    }
-}
-var userManager = new userManager("multi");
-userManager.createUser("James");
-userManager.createUser("Graham");
-
-var james = userManager.getUser("James");
-console.log(james.name);
-
-console.log("Graham ", userManager.getNextUser("James"));
-console.log("James ", userManager.getNextUser("Graham"));
-
-function gameManager(userManager){
-    this.grid = null;
-    this.deck = null;
-    this.deck = null;
-    this.userManager = userManager;
-
-    this.start = function(){
-        this.grid = createGrid();
-        this.deck = createDeck();
-        this.deck = shuffle(this.deck);
-
-        // dealing first card onto the grid
-        this.grid[32][32] = this.deck.pop();
-
-        // deal hands
-        var deck = this.deck; // temp var for the function below
-        this.userManager.forAllUsers(function(user){
-            user.hand = dealHand(deck);
-        });
-        // this.userManager.forAllUsers(function(user){
-        //     console.log(user);
-        // });
-        var user = this.userManager.getFirstTurnUser();
-        if(user === null){
-            return false;
-        }
-        user.turn = true;
-    };
-
-    this.endTurn = function(name){
-        var user = this.userManager.getUser(name);
-        if(user === null ){
-            console.log("User ", name, " does no exist");
-            return false; // user does not exist
-        }
-        if(user.turn === false){
-            console.log("User ", name, " is not their turn");
-            return false; // not the users turn
-        }
-        // now handle the turn logic
-        user.turn = false;
-        user.hand = refreshHand(user.hand,this.deck);
-        this.userManager.getNextUser(name).turn = true;
-    }
-}
-
-var gameManager = new gameManager(userManager);
-gameManager.start();
-console.log(userManager.users);
+var global = {};
+global.gameManager = null;
+global.userManager = null;
+// gameManager.start();
+// console.log(userManager.users);
 //gameManager.endTurn("Graham");
 
-var global = {};
-function init(){
-    global.grid = createGrid();
-    global.deck = createDeck();
-    global.deck = shuffle(global.deck);
-    global.grid[32][32] = global.deck.pop();
-    global.users = {};
-}
+// var global = {};
+// function init(){
+//     global.grid = createGrid();
+//     global.deck = createDeck();
+//     global.deck = shuffle(global.deck);
+//     global.grid[32][32] = global.deck.pop();
+//     global.users = {};
+// }
 
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
-// start server on the specified port and binding host
-// app.listen(appEnv.port, '0.0.0.0', function() {
-//     // print a message when the server starts listening
-//     console.log("server starting on " + appEnv.url);
-// });
+//start server on the specified port and binding host
+app.listen(appEnv.port, '0.0.0.0', function() {
+    // print a message when the server starts listening
+    console.log("server starting on " + appEnv.url);
+});

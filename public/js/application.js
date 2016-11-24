@@ -246,7 +246,7 @@ $(document).ready(function () {
             type: 'POST',
             data: JSON.stringify(data),
             contentType: 'application/json',
-            url: '/grid',
+            url: '/endTurn',
             success: function (message) {
                 console.log('grid post success');
 

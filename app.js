@@ -26,7 +26,7 @@ app.post('/newGame', function (req, res) {
         res.sendStatus(400);
     } else {
         init();
-        global.users[req.body.name] = {hand: dealHand(global.deck)};
+        global.users[req.body.name] = {hand: dealHand(global.deck), turn: false};
         res.sendStatus(200);
     }
     console.log('newGame');
@@ -149,6 +149,125 @@ app.get('/user/:name/hand', function(req,res) {
     res.send(message);
 });
 
+function user(name){
+    this.name = name;
+    this.hand = [];
+    this.score = 0;
+    this.turn = false;
+}
+// create user manager
+function userManager(mode) {
+    this.users = [];
+    this.mode = mode;
+
+    this.getUser = function(name){
+        for(var i=0; i < this.users.length; i++){
+            if(this.users[i].name === name) {
+                return this.users[i];
+            }
+        }
+        return null;
+    };
+
+    this.createUser = function (name) {
+        if (this.getUser(name) !== null) {
+            return false; // if the user already exists return false, can not override an existing user
+        }
+        this.users.push(new user(name));
+        return true;
+    };
+
+    this.getNextUser = function(name){
+        if(this.getUser(name) === null){
+            return null;
+        }
+
+        for(var i=0; i < this.users.length; i++){
+            if(this.users[i].name === name) {
+                if(i === this.users.length - 1){
+                    return this.users[0];
+                } else {
+                    return this.users[i+1];
+                }
+            }
+        }
+    };
+
+    this.getFirstTurnUser = function(){
+        if(this.users.length === 0){
+            return null;
+        }
+        var user = this.users[Math.floor(Math.random()*this.users.length)];
+        return user;
+    };
+
+    this.forAllUsers = function(func){
+        for(var i=0; i < this.users.length; i++){
+            func(user);
+        }
+    }
+}
+var userManager = new userManager("multi");
+userManager.createUser("James");
+userManager.createUser("Graham");
+
+var james = userManager.getUser("James");
+console.log(james.name);
+
+console.log("Graham ", userManager.getNextUser("James"));
+console.log("James ", userManager.getNextUser("Graham"));
+
+function gameManager(userManager){
+    this.grid = null;
+    this.deck = null;
+    this.deck = null;
+    this.userManager = userManager;
+
+    this.start = function(){
+        this.grid = createGrid();
+        this.deck = createDeck();
+        this.deck = shuffle(this.deck);
+
+        // dealing first card onto the grid
+        this.grid[32][32] = this.deck.pop();
+
+        // deal hands
+        var deck = this.deck; // temp var for the function below
+        this.userManager.forAllUsers(function(user){
+            user.hand = dealHand(deck);
+        });
+        // this.userManager.forAllUsers(function(user){
+        //     console.log(user);
+        // });
+        var user = this.userManager.getFirstTurnUser();
+        if(user === null){
+            return false;
+        }
+        user.turn = true;
+    };
+
+    this.endTurn = function(name){
+        var user = this.userManager.getUser(name);
+        if(user === null ){
+            console.log("User ", name, " does no exist");
+            return false; // user does not exist
+        }
+        if(user.turn === false){
+            console.log("User ", name, " is not their turn");
+            return false; // not the users turn
+        }
+        // now handle the turn logic
+        user.turn = false;
+        user.hand = refreshHand(user.hand,this.deck);
+        this.userManager.getNextUser(name).turn = true;
+    }
+}
+
+var gameManager = new gameManager(userManager);
+gameManager.start();
+console.log(userManager.users);
+//gameManager.endTurn("Graham");
+
 var global = {};
 function init(){
     global.grid = createGrid();
@@ -162,7 +281,7 @@ function init(){
 var appEnv = cfenv.getAppEnv();
 
 // start server on the specified port and binding host
-app.listen(appEnv.port, '0.0.0.0', function() {
-    // print a message when the server starts listening
-    console.log("server starting on " + appEnv.url);
-});
+// app.listen(appEnv.port, '0.0.0.0', function() {
+//     // print a message when the server starts listening
+//     console.log("server starting on " + appEnv.url);
+// });

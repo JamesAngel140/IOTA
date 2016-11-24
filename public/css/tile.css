@@ -22,16 +22,15 @@
 .blank {
     width: var(--tileWidth);
     height: var(--tileWidth);
-    border: var(--tileBorderWidth) white;
+    border: var(--tileBorderWidth) transparent;
     border-style: solid;
     margin: 1px;
-    background: white;
 }
 
 .target {
     width: var(--tileWidth);
     height: var(--tileWidth);
-    border: var(--tileBorderWidth) lightgrey;
+    border: var(--tileBorderWidth) rgba(0,0,0,.5);
     border-style: solid;
     margin: 1px;
     background: lightgray;
@@ -104,4 +103,7 @@
     position: absolute;
     top: 15px;
     width: var(--shapeWidth);
+}
+.userbox {
+    
 }

@@ -1,11 +1,11 @@
 function handToHtml(hand) {
     html = '<table>';
     html += '<tr>';
-    for (var y = 0; y < hand.length; y++) {
-        if(hand[y] && hand[y].type === "tile"){
-            html += '<td>' + tileToHtml(hand[y], -1, y) + '</td>';
+    for (var i = 0; i < hand.length; i++) {
+        if(hand[i] && hand[i].type === "tile"){
+            html += '<td>' + tileToHtml(hand[i], -1, i) + '</td>';
         } else {
-            html += '<td>' + blankToHtml(hand[y]) + '</td>';
+            html += '<td>' + blankToHtml(hand[i]) + '</td>';
         }
     }
     html += '</tr>';
@@ -76,5 +76,22 @@ function gridToHtml(grid) {
         html += '</tr>';
     }
     html += '</table>';
+    return html;
+}
+function usersToHtml(users){
+    var html = "";
+    html += "<table>";
+    for (var i = 0; i < users.length; i++) {
+        html += "<td>";
+        html += '<div class="panel ' + (users[i].turn ? 'panel-danger' : 'panel-default') + '">';
+        html += '<div class="panel-heading">' + users[i].name + '</div>';
+        html += '<div class="panel-body">';
+        html += i;
+        html += '</div>';
+        html += '</div>';
+        html += "</td>";
+    }
+    html += "</table>";
+
     return html;
 }

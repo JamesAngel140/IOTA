@@ -194,6 +194,7 @@ $(document).ready(function () {
                 grid = message.grid;
                 user = message.user;
                 init();
+                getUsers();
             }
         });
     }
@@ -212,6 +213,7 @@ $(document).ready(function () {
                         // stop polling and refresh everything
                         clearInterval(timer);
                         getGrid();
+                        getUsers();
                     }
                 }
             });
@@ -229,6 +231,13 @@ $(document).ready(function () {
         if(user.turn === false){
             poll();
         }
+    }
+
+    function pollUsers(){
+        var timer = setInterval(function(){
+            console.log("poll for users");
+            getUsers();
+        }, 2000);
     }
 
     function getGrid(){
@@ -254,6 +263,19 @@ $(document).ready(function () {
             }
         });
     }
+    function getUsers(){
+            $.ajax({
+                type: 'GET',
+                contentType: 'application/json',
+                url: '/' + key + '/' + name + '/users',
+                success: function(result, status, xhr){
+                    users = JSON.parse(result);
+                    var html = usersToHtml(users);
+                    $("#users").html(html);
+                }
+            });
+    }
 
     getGrid();
+    getUsers();
 });

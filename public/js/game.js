@@ -199,6 +199,25 @@ $(document).ready(function () {
     }
     $("#end").click(endClick);
 
+    function poll(){
+        var timer = setInterval(function(){
+            console.log("poll for turn");
+            $.ajax({
+                type: 'GET',
+                contentType: 'application/json',
+                url: '/' + key + '/' + name + '/user',
+                success: function(result, status, xhr){
+                    user = JSON.parse(result);
+                    if(user.turn === true){
+                        // stop polling and refresh everything
+                        clearInterval(timer);
+                        getGrid();
+                    }
+                }
+            });
+        }, 2000);
+    }
+
     function init(){
         history = [];
         tilesPlaced = [];
@@ -206,6 +225,10 @@ $(document).ready(function () {
 
         addBlanksToGrid(grid);
         buildDesktop(grid, user);
+
+        if(user.turn === false){
+            poll();
+        }
     }
 
     function getGrid(){

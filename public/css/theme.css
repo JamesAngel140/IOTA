@@ -1,6 +1,40 @@
 .space{
     margin: 5px;
 }
-td, th {
-    padding: 2px;
+
+table, td, th {
+    /*padding: 2px;*/
+    border: none;
+    text-align: left;
+}
+
+h3 {
+    font-size:250%;
+    font-weight: 300;
+}
+
+hr {
+    margin-top:30px;
+    margin-bottom:30px;
+}
+
+.button {
+    width: 150px;
+    padding: 10px;
+}
+
+.welcome {
+    margin: 18% auto 0 auto;
+    max-width: 500px;
+    text-align: center;
+}
+
+.input-group {
+    margin-left: 30%;
+    margin-bottom: 20px;
+    width: 200px;
+}
+
+.input {
+    height: 48px;
 }

@@ -14,7 +14,7 @@ function createGrid() {
     return grid;
 }
 
-function prepareGrid(grid){
+function clearGrid(grid){
     for (var x = 0; x < size; x++) {
         for (var y = 0; y < size; y++) {
             if(grid[x][y] && grid[x][y].type !== "tile") {

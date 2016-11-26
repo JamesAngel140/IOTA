@@ -96,6 +96,15 @@ $(document).ready(function () {
             user.hand[handIndex] = null;
 
             buildDesktop(grid, user);
+            var score = calculateScore(grid, tilesPlaced);
+            // add the score to the correct user
+            users.forEach(function(user){
+                if(user.name === name){
+                    user.score += score;
+                }
+            });
+            var html = usersToHtml(users);
+            $("#users").html(html);
         }
     }
     function tileClick(e) {
@@ -172,14 +181,25 @@ $(document).ready(function () {
     }
     $("#reset").click(resetClick);
 
+    function getUserFromUsers(name){
+        for(var i = 0;i < users.length; i++){
+            if(users[i].name === name ){
+                return users[i];
+            }
+        }
+        return null;
+    }
+
     function endClick(e) {
         history = [];
         handIndex = -1;
         tilesPlaced = [];
 
+        var tmp = getUser(name);
+
         var data = {
             grid: clearGrid(clone(grid)),
-            hand: user.hand
+            user: getUserFromUsers(name)
         };
 
         $.ajax({

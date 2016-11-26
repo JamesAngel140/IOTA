@@ -86,7 +86,7 @@ function usersToHtml(users){
         html += '<div class="panel ' + (users[i].turn ? 'panel-danger' : 'panel-default') + '">';
         html += '<div class="panel-heading">' + users[i].name + '</div>';
         html += '<div class="panel-body">';
-        html += i;
+        html += users[i].score;
         html += '</div>';
         html += '</div>';
         html += "</td>";

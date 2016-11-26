@@ -208,7 +208,7 @@ app.post('/:key/:name/endTurn', function (req, res) {
     }
 
     if (typeof req.body === 'undefined' ||
-        typeof req.body.hand === 'undefined' ||
+        typeof req.body.user === 'undefined' ||
         typeof req.body.grid === 'undefined') {
         console.log('missing data');
 
@@ -217,7 +217,8 @@ app.post('/:key/:name/endTurn', function (req, res) {
     }
 
     var grid = req.body.grid;
-    var hand = req.body.hand;
+    var hand = req.body.user.hand;
+    var score = req.body.user.score;
 
     var user = global[key].gameManager.userManager.getUser(name);
     if (!user) {
@@ -228,6 +229,7 @@ app.post('/:key/:name/endTurn', function (req, res) {
 
     global[key].gameManager.grid = grid;
     user.hand = hand;
+    user.score = score;
 
     if (!global[key].gameManager.endTurn(name)) {
         console.log(user, ' can not end turn');

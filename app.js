@@ -237,7 +237,9 @@ app.post('/:key/:name/endTurn', function (req, res) {
         return;
     }
 
-    var message = JSON.stringify({grid: grid, user: user});
+    var users = global[key].gameManager.userManager.users;
+
+    var message = JSON.stringify({grid: grid, users: users});
     res.send(message);
 });
 

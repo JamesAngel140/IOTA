@@ -13,7 +13,8 @@ $(document).ready(function () {
     var tilesPlaced = [];
     var handIndex = -1;
     var grid = null;
-    var user = null;
+    var users = null;
+    var runningScore = 0;
 
     var tmp = window.location.href.split("/");
 
@@ -62,9 +63,54 @@ $(document).ready(function () {
             }
         }
     }
-    function clone(obj) {
-        return JSON.parse(JSON.stringify(obj));
+    function getUser(users, name) {
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].name === name) {
+                return users[i];
+            }
+        }
+        return null;
     }
+
+    function buildDesktop(grid, users) {
+        if (history.length) {
+            $("#undo").show();
+            $("#reset").show();
+        } else {
+            $("#undo").hide();
+            $("#reset").hide();
+        }
+
+        var html = usersToHtml(users);
+        $("#users").html(html);
+
+        var user = getUser(users, name);
+
+        // if any of the hand is null then allow next go
+        var count = 0;
+        user.hand.forEach(function (item) {
+            if (item === null) {
+                count++;
+            }
+        });
+        if (count > 0) {
+            $("#end").show();
+        } else {
+            $("#end").hide();
+        }
+        if (user.turn) {
+            addTargetsToGrid(grid);
+        }
+        $("#grid").html(gridToHtml(grid));
+
+        handIndex = -1;
+        $("#hand").html(handToHtml(user.hand));
+        if (user.turn) {
+            $('#grid .target').click(targetClick);
+            $('#hand .tile').click(tileClick);
+        }
+    }
+
     function targetClick(e) {
         // read the data coordinates from the div clicked
         var x = $(this).attr("data-x");
@@ -78,13 +124,15 @@ $(document).ready(function () {
             return;
         }
 
+        var user = getUser(users, name);
+
         var validMove = isValidMove(grid, user.hand[handIndex], x, y, tilesPlaced);
 
         if (isGridEmpty(grid) || validMove) {
             $(this).addClass("targetSelected");
 
             // keep history before the change
-            history.push({grid: clone(grid), hand: clone(user.hand), tilesPlaced: clone(tilesPlaced)});
+            history.push({grid: clone(grid), users: clone(users), tilesPlaced: clone(tilesPlaced)});
 
             // add new tile to grid
             var tile = user.hand[handIndex];
@@ -95,14 +143,15 @@ $(document).ready(function () {
             tilesPlaced.push(tile);
             user.hand[handIndex] = null;
 
-            buildDesktop(grid, user);
+            buildDesktop(grid, users);
             var score = calculateScore(grid, tilesPlaced);
+            user.score = runningScore + score;
             // add the score to the correct user
-            users.forEach(function(user){
-                if(user.name === name){
-                    user.score += score;
-                }
-            });
+            // users.forEach(function (user) {
+            //     if (user.name === name) {
+            //         user.score = score;
+            //     }
+            // });
             var html = usersToHtml(users);
             $("#users").html(html);
         }
@@ -118,6 +167,8 @@ $(document).ready(function () {
         console.log("tile index", y);
         $(this).addClass("targetSelected");
 
+        var user = getUser(users, name);
+
         // tbd - this needs to be slected with a help button
         addTargetsToGrid(grid);
         for (var x = 0; x < size; x++) {
@@ -130,48 +181,17 @@ $(document).ready(function () {
         $("#grid").html(gridToHtml(grid));
         $('#grid .target').click(targetClick);
     }
-    function buildDesktop(grid, user) {
-        if (history.length) {
-            $("#undo").show();
-            $("#reset").show();
-        } else {
-            $("#undo").hide();
-            $("#reset").hide();
-        }
-        // if any of the hand is null then allow next go
-        var count = 0;
-        user.hand.forEach(function (item) {
-            if (item === null) {
-                count++;
-            }
-        });
-        if (count > 0) {
-            $("#end").show();
-        } else {
-            $("#end").hide();
-        }
-        if(user.turn) {
-            addTargetsToGrid(grid);
-        }
-        $("#grid").html(gridToHtml(grid));
-
-        handIndex = -1;
-        $("#hand").html(handToHtml(user.hand));
-        if(user.turn) {
-            $('#grid .target').click(targetClick);
-            $('#hand .tile').click(tileClick);
-        }
-    }
 
     function undoClick(e) {
         var previous = history.pop();
         if (previous) {
             grid = previous.grid;
-            user.hand = previous.hand;
+            users = previous.users;
             tilesPlaced = previous.tilesPlaced;
-            clearGrid(grid);
-            addBlanksToGrid(grid);
-            buildDesktop(grid, user);
+
+            //clearGrid(grid);
+            //addBlanksToGrid(grid);
+            buildDesktop(grid, users);
         }
     }
     $("#undo").click(undoClick);
@@ -181,25 +201,16 @@ $(document).ready(function () {
     }
     $("#reset").click(resetClick);
 
-    function getUserFromUsers(name){
-        for(var i = 0;i < users.length; i++){
-            if(users[i].name === name ){
-                return users[i];
-            }
-        }
-        return null;
-    }
-
     function endClick(e) {
         history = [];
         handIndex = -1;
         tilesPlaced = [];
 
-        var tmp = getUser(name);
+        var user = getUser(users, name);
 
         var data = {
             grid: clearGrid(clone(grid)),
-            user: getUserFromUsers(name)
+            user: user
         };
 
         $.ajax({
@@ -212,90 +223,71 @@ $(document).ready(function () {
 
                 var message = JSON.parse(result);
                 grid = message.grid;
-                user = message.user;
+                users = message.users;
                 init();
-                getUsers();
             }
         });
     }
     $("#end").click(endClick);
 
-    function poll(){
-        var timer = setInterval(function(){
+    function poll() {
+        var timer = setInterval(function () {
             console.log("poll for turn");
             $.ajax({
                 type: 'GET',
                 contentType: 'application/json',
                 url: '/' + key + '/' + name + '/user',
-                success: function(result, status, xhr){
+                success: function (result, status, xhr) {
                     user = JSON.parse(result);
-                    if(user.turn === true){
+                    if (user.turn === true) {
                         // stop polling and refresh everything
                         clearInterval(timer);
-                        getGrid();
-                        getUsers();
+                        init();
                     }
                 }
             });
         }, 2000);
     }
 
-    function init(){
+    function init() {
         history = [];
         tilesPlaced = [];
         handIndex = -1;
 
-        addBlanksToGrid(grid);
-        buildDesktop(grid, user);
+        $.when(getGrid(), getUsers()).then(function(){
+            addBlanksToGrid(grid);
+            buildDesktop(grid, users);
 
-        if(user.turn === false){
-            poll();
-        }
+            var user = getUser(users, name);
+            if (user.turn === false) {
+                poll();
+            }
+        });
     }
 
-    function pollUsers(){
-        var timer = setInterval(function(){
-            console.log("poll for users");
-            getUsers();
-        }, 2000);
-    }
-
-    function getGrid(){
-        $.ajax({
+    function getGrid() {
+        return $.ajax({
             type: 'GET',
             url: '/' + key + '/' + name + '/grid',
             success: function (result, status, xhr) {
                 console.log('get grid success');
                 grid = JSON.parse(result);
-                getUser();
             }
         });
     }
-    function getUser(){
-        $.ajax({
+    function getUsers() {
+        return $.ajax({
             type: 'GET',
-            url: '/' + key + '/' + name + '/user',
+            contentType: 'application/json',
+            url: '/' + key + '/' + name + '/users',
             success: function (result, status, xhr) {
-                console.log('get user success');
-                user = JSON.parse(result);
-
-                init();
+                console.log('get grid success');
+                users = JSON.parse(result);
+                var user = getUser(users, name);
+                runningScore = user.score;
             }
         });
     }
-    function getUsers(){
-            $.ajax({
-                type: 'GET',
-                contentType: 'application/json',
-                url: '/' + key + '/' + name + '/users',
-                success: function(result, status, xhr){
-                    users = JSON.parse(result);
-                    var html = usersToHtml(users);
-                    $("#users").html(html);
-                }
-            });
-    }
 
-    getGrid();
-    getUsers();
+    init();
 });

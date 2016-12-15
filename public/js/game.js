@@ -14,7 +14,6 @@ $(document).ready(function () {
     var handIndex = -1;
     var grid = null;
     var users = null;
-    var runningScore = 0;
 
     var tmp = window.location.href.split("/");
 
@@ -31,7 +30,7 @@ $(document).ready(function () {
         }
     }
     function addBlanksAroundTile(grid, x, y) {
-        var size = 3;
+        var size = 2;
         for (var a = x - size; a <= x + size; a++) {
             for (var b = y - size; b <= y + size; b++) {
                 if (grid[a][b] === null) {
@@ -76,39 +75,36 @@ $(document).ready(function () {
         if (history.length) {
             $("#undo").show();
             $("#reset").show();
+            $("#swapSpan").hide();
         } else {
             $("#undo").hide();
             $("#reset").hide();
+            $("#swapSpan").show();
         }
 
-        var html = usersToHtml(users);
-        $("#users").html(html);
+        if(users.length) {
+            var html = usersToHtml(users);
+            $("#users").html(html);
 
-        var user = getUser(users, name);
-
-        // if any of the hand is null then allow next go
-        var count = 0;
-        user.hand.forEach(function (item) {
-            if (item === null) {
-                count++;
+            var user = getUser(users, name);
+            if(user) {
+                if (user.turn) {
+                    addTargetsToGrid(grid);
+                    $("#end").show();
+                } else {
+                    $("#end").hide();
+                    $("#swapSpan").hide();
+                }
+                $("#hand").html(handToHtml(user.hand));
+                if (user.turn) {
+                    $('#grid .target').click(targetClick);
+                    $('#hand .tile').click(tileClick);
+                }
             }
-        });
-        if (count > 0) {
-            $("#end").show();
-        } else {
-            $("#end").hide();
         }
-        if (user.turn) {
-            addTargetsToGrid(grid);
-        }
-        $("#grid").html(gridToHtml(grid));
 
+        $("#grid").html(gridToHtml(grid));
         handIndex = -1;
-        $("#hand").html(handToHtml(user.hand));
-        if (user.turn) {
-            $('#grid .target').click(targetClick);
-            $('#hand .tile').click(tileClick);
-        }
     }
 
     function targetClick(e) {
@@ -144,40 +140,36 @@ $(document).ready(function () {
             user.hand[handIndex] = null;
 
             buildDesktop(grid, users);
-            var score = calculateScore(grid, tilesPlaced);
-            user.score = runningScore + score;
-            // add the score to the correct user
-            // users.forEach(function (user) {
-            //     if (user.name === name) {
-            //         user.score = score;
-            //     }
-            // });
+            user.delta = calculateScore(grid, tilesPlaced);
+
             var html = usersToHtml(users);
             $("#users").html(html);
         }
     }
     function tileClick(e) {
-        if (handIndex !== -1) {
-            $('#x-1y' + handIndex).removeClass("targetSelected");
+        if (handIndex !== -1 && !$('#swap').prop('checked')) {
+            $('.tile').removeClass("targetSelected");
         }
         var y = $(this).attr("data-y");
         y = parseInt(y);
 
         handIndex = y;
+        var user = getUser(users, name);
+        user.swap.push(user.hand[handIndex]);
         console.log("tile index", y);
         $(this).addClass("targetSelected");
 
         var user = getUser(users, name);
 
-        // tbd - this needs to be slected with a help button
+        // tbd - this needs to be selected with a help button
         addTargetsToGrid(grid);
-        for (var x = 0; x < size; x++) {
-            for (var y = 0; y < size; y++) {
-                if (grid[x][y] && grid[x][y].type === "target" && !isValidMove(grid, user.hand[handIndex], x, y, tilesPlaced)) {
-                    grid[x][y] = {type: "blank"};
-                }
-            }
-        }
+        // for (var x = 0; x < size; x++) {
+        //     for (var y = 0; y < size; y++) {
+        //         if (grid[x][y] && grid[x][y].type === "target" && !isValidMove(grid, user.hand[handIndex], x, y, tilesPlaced)) {
+        //             grid[x][y] = {type: "blank"};
+        //         }
+        //     }
+        // }
         $("#grid").html(gridToHtml(grid));
         $('#grid .target').click(targetClick);
     }
@@ -189,8 +181,6 @@ $(document).ready(function () {
             users = previous.users;
             tilesPlaced = previous.tilesPlaced;
 
-            //clearGrid(grid);
-            //addBlanksToGrid(grid);
             buildDesktop(grid, users);
         }
     }
@@ -202,16 +192,22 @@ $(document).ready(function () {
     $("#reset").click(resetClick);
 
     function endClick(e) {
+        var user = getUser(users, name);
+        user.score += user.delta;
+        user.delta = 0;
+
+        var data = {
+            grid: clearGrid(grid),
+            user: user
+        };
+
+        tilesPlaced.forEach(function(tile){
+            data.grid[tile.x][tile.y].placed = true;
+        });
+
         history = [];
         handIndex = -1;
         tilesPlaced = [];
-
-        var user = getUser(users, name);
-
-        var data = {
-            grid: clearGrid(clone(grid)),
-            user: user
-        };
 
         $.ajax({
             type: 'POST',
@@ -230,23 +226,34 @@ $(document).ready(function () {
     }
     $("#end").click(endClick);
 
+    function resume(){
+        $("#resume").hide();
+        init();
+    }
+    $("#resume").click(resume);
+
     function poll() {
+        var count = 0;
+        var duration = 3; // in seconds
+        $("#resume").hide();
         var timer = setInterval(function () {
+            if(count++ > 120/duration){
+                clearInterval(timer); // and stop
+                $("#resume").show();
+            }
             console.log("poll for turn");
             $.ajax({
                 type: 'GET',
                 contentType: 'application/json',
-                url: '/' + key + '/' + name + '/user',
+                url: '/' + key + '/' + name + '/users',
                 success: function (result, status, xhr) {
-                    user = JSON.parse(result);
-                    if (user.turn === true) {
-                        // stop polling and refresh everything
+                    if(JSON.stringify(users) !== result) {
                         clearInterval(timer);
                         init();
                     }
                 }
             });
-        }, 2000);
+        }, duration * 1000);
     }
 
     function init() {
@@ -281,13 +288,95 @@ $(document).ready(function () {
             contentType: 'application/json',
             url: '/' + key + '/' + name + '/users',
             success: function (result, status, xhr) {
-                console.log('get grid success');
+                console.log('get users success');
                 users = JSON.parse(result);
                 var user = getUser(users, name);
-                runningScore = user.score;
+                user.delta = 0;
             }
         });
     }
 
     init();
+    // grid = createGrid();
+    // var deck = createDeck();
+    // grid[32][32] = removeFromDeck(deck, "circle", "red", "1");
+    // grid[32][33] = removeFromDeck(deck, "cross", "blue", "2");
+    // grid[32][34] = removeFromDeck(deck, "triangle", "green", "3");
+    // var tile = removeFromDeck(deck, "circle", "red", "4");
+    // var validMove = isValidMove(grid, tile, 32, 35, []);
+    // if(validMove) {
+    //     grid[32][35] = tile;
+    // }
+    // buildDesktop(grid, []);
+    // code for checked buttons
+        $('.button-checkbox').each(function () {
+
+            // Settings
+            var $widget = $(this),
+                $button = $widget.find('button'),
+                $checkbox = $widget.find('input:checkbox'),
+                color = $button.data('color'),
+                settings = {
+                    on: {
+                        icon: 'glyphicon glyphicon-check'
+                    },
+                    off: {
+                        icon: 'glyphicon glyphicon-unchecked'
+                    }
+                };
+
+            // Event Handlers
+            $button.on('click', function () {
+                $checkbox.prop('checked', !$checkbox.is(':checked'));
+                $checkbox.triggerHandler('change');
+                updateDisplay();
+            });
+            $checkbox.on('change', function () {
+                updateDisplay();
+            });
+
+            // Actions
+            function updateDisplay() {
+                // reset selection and swap hand
+                $('.tile').removeClass("targetSelected");
+                if(users) {
+                    var user = getUser(users, name);
+                    user.swap = [];
+                }
+
+                var isChecked = $checkbox.is(':checked');
+
+                // Set the button's state
+                $button.data('state', (isChecked) ? "on" : "off");
+
+                // Set the button's icon
+                $button.find('.state-icon')
+                    .removeClass()
+                    .addClass('state-icon ' + settings[$button.data('state')].icon);
+
+                // Update the button's color
+                if (isChecked) {
+                    $button
+                        .removeClass('btn-default')
+                        .addClass('btn-' + color + ' active');
+                }
+                else {
+                    $button
+                        .removeClass('btn-' + color + ' active')
+                        .addClass('btn-default');
+                }
+            }
+
+            // Initialization
+            function setUpCheckboxes() {
+
+                updateDisplay();
+
+                // Inject the icon if applicable
+                if ($button.find('.state-icon').length == 0) {
+                    $button.prepend('<i class="state-icon ' + settings[$button.data('state')].icon + '"></i> ');
+                }
+            }
+            setUpCheckboxes();
+        });
 });

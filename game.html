@@ -7,19 +7,41 @@
     <link rel="stylesheet" type="text/css" href="bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/tile.css"/>
     <link rel="stylesheet" type="text/css" href="css/theme.css"/>
+    <link rel="icon" href="images/favicon.png">
 </head>
 <body>
 <div id="game">
-    <table style="width:100%">
-    <th style="text-align:left;width:50%"><div id="hand" class="space"></div></th>
-    <th><div id="users"></div></th>
-        </table>
-    <div id="buttons" class="space">
-        <button id="undo" type="button" style="display:none" class="btn btn-success">Undo</button>
-        <button id="reset" type="button" style="display:none" class="btn btn-warning">Reset</button>
-        <button id="end" type="button" style="display:none" class="btn btn-primary">End Turn</button>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <table style="width:100%">
+                <tr>
+                    <th style="text-align:left;width:50%">
+                        <div id="hand"></div>
+                    </th>
+                    <th>
+                        <div id="users"></div>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="2" id="buttons">
+                        <span class="button-checkbox" id="swapSpan">
+                            <button type="button" class="btn" data-color="warning">Swap Cards</button>
+                            <input id="swap" type="checkbox" class="hidden"/>
+                        </span>
+                        <button id="undo" type="button" style="display:none" class="btn btn-success">Undo</button>
+                        <button id="reset" type="button" style="display:none" class="btn btn-warning">Reset</button>
+                        <button id="end" type="button" style="display:none" class="btn btn-primary">End Turn</button>
+                        <button id="resume" type="button" style="display:none" class="btn btn-danger">Resume</button>
+                    </th>
+                </tr>
+            </table>
+
+        </div>
+    </nav>
+    <div class="container" style="padding-top:130px">
+        <div id="grid"></div>
     </div>
-    <div id="grid" class="space"></div>
+</div>
 </div>
 </body>
 <!--Load library scripts-->

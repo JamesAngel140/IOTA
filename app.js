@@ -48,7 +48,7 @@ app.post('/createGame', function (req, res) {
     // create a new game using a random key
     var key = generateKey();
     global[key] = {};
-    global[key].gameManager = new gameManager;
+    global[key].gameManager = new GameManager();
 
     // create the new user
     if (!global[key].gameManager.userManager.createUser(name)) {
@@ -136,7 +136,6 @@ app.get('/:key/:name/users', function (req, res) {
 
     // get the users for a particular game key
     var key = req.params.key;
-    var name = req.params.name;
 
     // check if a game with this key has been created
     if (typeof global[key] === 'undefined') {
@@ -151,8 +150,6 @@ app.get('/:key/:name/users', function (req, res) {
     res.json(message);
 });
 app.get('/:key/:name/user', function (req, res) {
-    console.log('user');
-
     // get the users for a particular game key
     var key = req.params.key;
     var name = req.params.name;
@@ -179,7 +176,6 @@ app.get('/:key/:name/grid', function (req, res) {
 
     // get the users for a particular game key
     var key = req.params.key;
-    var name = req.params.name;
 
     // check if a game with this key has been created
     if (typeof global[key] === 'undefined') {
@@ -218,6 +214,7 @@ app.post('/:key/:name/endTurn', function (req, res) {
 
     var grid = req.body.grid;
     var hand = req.body.user.hand;
+    var swap = req.body.user.swap;
     var score = req.body.user.score;
 
     var user = global[key].gameManager.userManager.getUser(name);
@@ -229,6 +226,7 @@ app.post('/:key/:name/endTurn', function (req, res) {
 
     global[key].gameManager.grid = grid;
     user.hand = hand;
+    user.swap = swap;
     user.score = score;
 
     if (!global[key].gameManager.endTurn(name)) {
@@ -244,13 +242,15 @@ app.post('/:key/:name/endTurn', function (req, res) {
 });
 
 // game objects
-function user(name) {
+function User(name) {
     this.name = name;
     this.hand = [];
+    this.swap = [];
     this.score = 0;
+    this.delta = 0;
     this.turn = false;
 }
-function userManager() {
+function UserManager() {
     this.users = [];
 
     this.getUser = function (name) {
@@ -265,7 +265,7 @@ function userManager() {
         if (this.getUser(name) !== null) {
             return false; // if the user already exists return false, can not override an existing user
         }
-        this.users.push(new user(name));
+        this.users.push(new User(name));
         return true;
     };
     this.getNextUser = function (name) {
@@ -287,8 +287,7 @@ function userManager() {
         if (this.users.length === 0) {
             return null;
         }
-        var user = this.users[Math.floor(Math.random() * this.users.length)];
-        return user;
+        return this.users[Math.floor(Math.random() * this.users.length)];
     };
     this.forAllUsers = function (func) {
         for (var i = 0; i < this.users.length; i++) {
@@ -296,10 +295,10 @@ function userManager() {
         }
     };
 }
-function gameManager() {
+function GameManager() {
     this.grid = null;
     this.deck = null;
-    this.userManager = new userManager;
+    this.userManager = new UserManager();
     this.startedBy = null;
 
     this.start = function (name) {
@@ -335,9 +334,21 @@ function gameManager() {
             console.log("User ", name, " is not their turn");
             return false; // not the users turn
         }
+        var tmpDeck = this.deck;
+        user.swap.forEach(function(tile){
+            // put swapped tile to the end of the deck
+            tmpDeck.unshift(tile);
+            // take the tile out of the hand
+            user.hand.forEach(function(handTile, index, arr){
+                if(JSON.stringify(handTile) === JSON.stringify(tile)){
+                    arr[index] = null;
+                }
+            });
+        });
+        user.swap = [];
+        user.hand = refreshHand(user.hand, this.deck);
         // now handle the turn logic
         user.turn = false;
-        user.hand = refreshHand(user.hand, this.deck);
         this.userManager.getNextUser(name).turn = true;
 
         return true;
@@ -425,17 +436,20 @@ var appEnv = cfenv.getAppEnv();
 function createTestGame(){
     var key = '0000';
     global[key] = {};
-    global[key].gameManager = new gameManager;
+    global[key].gameManager = new GameManager();
     global[key].gameManager.userManager.createUser('James');
     global[key].gameManager.userManager.createUser('Sam');
+    global[key].gameManager.userManager.createUser('Emily');
     global[key].gameManager.start('James');
 
     // force the turn to James
     global[key].gameManager.userManager.getUser('James').turn = true;
     global[key].gameManager.userManager.getUser('Sam').turn = false;
+    global[key].gameManager.userManager.getUser('Emily').turn = false;
 
     configureNewPaths('James', key);
     configureNewPaths('Sam', key);
+    configureNewPaths('Emily', key);
 }
 createTestGame();
 

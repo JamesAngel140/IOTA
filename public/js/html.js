@@ -21,7 +21,7 @@ function blankToHtml() {
     return html;
 }
 function tileToHtml(tile, x, y) {
-    var html = '<div id="x' + x + 'y' + y + '" class="tile" data-x="' + x + '" data-y="' + y + '">' +
+    var html = '<div id="x' + x + 'y' + y + '" class="tile' + (tile.placed ? " tilePlaced" : "") + '" data-x="' + x + '" data-y="' + y + '">' +
         '<span class="alignleft">' + tile.number + '</span>' +
         '<span class="alignright">' + tile.number + '</span>' +
         '<div style="clear: both;">' + '</div>' +
@@ -83,10 +83,14 @@ function usersToHtml(users){
     html += "<table>";
     for (var i = 0; i < users.length; i++) {
         html += "<td>";
-        html += '<div class="panel ' + (users[i].turn ? 'panel-danger' : 'panel-default') + '">';
+        html += '<div class="panel ' + (users[i].turn ? 'panel-success' : 'panel-default') + '">';
         html += '<div class="panel-heading">' + users[i].name + '</div>';
         html += '<div class="panel-body">';
-        html += users[i].score;
+        if(users[i].turn && users[i].delta){
+            html += users[i].score + " + " + (users[i].delta);
+        } else {
+            html += users[i].score;
+        }
         html += '</div>';
         html += '</div>';
         html += "</td>";

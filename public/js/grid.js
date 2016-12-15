@@ -17,7 +17,9 @@ function createGrid() {
 function clearGrid(grid){
     for (var x = 0; x < size; x++) {
         for (var y = 0; y < size; y++) {
-            if(grid[x][y] && grid[x][y].type !== "tile") {
+            if(grid[x][y] && grid[x][y].type === "tile") {
+                grid[x][y].placed = false;
+            } else {
                 grid[x][y] = null;
             }
         }

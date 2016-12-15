@@ -11,17 +11,24 @@ function isGridEmpty(grid) {
     }
     return 1;
 }
-var getVariables = function (grid, tile, x, y) {
+function unique(arr) {
+    var a = [];
+    for (var i=0, l=arr.length; i<l; i++)
+        if (a.indexOf(arr[i]) === -1 && arr[i] !== '')
+            a.push(arr[i]);
+    return a;
+}
+function getVariables(grid, tile, x, y) {
     var xTiles = [];
     // start at x and go left
     var a = x - 1;
-    while(a > x - 3 && grid[a][y] && grid[a][y].type === "tile"){
+    while(a > x - 4 && grid[a][y] && grid[a][y].type === "tile"){
         xTiles.push(grid[a][y]);
         a--;
     }
     // start at x and go right
     a = x + 1;
-    while(a < x + 3 && grid[a][y] && grid[a][y].type === "tile"){
+    while(a < x + 4 && grid[a][y] && grid[a][y].type === "tile"){
         xTiles.push(grid[a][y]);
         a++;
     }
@@ -31,13 +38,13 @@ var getVariables = function (grid, tile, x, y) {
     var yTiles = [];
     // start at y and go up
     a = y - 1;
-    while(a > y - 3 && grid[x][a] && grid[x][a].type === "tile"){
+    while(a > y - 4 && grid[x][a] && grid[x][a].type === "tile"){
         yTiles.push(grid[x][a]);
         a--;
     }
     // start at y and go down
     a = y + 1;
-    while(a < y + 3 && grid[x][a] && grid[x][a].type === "tile"){
+    while(a < y + 4 && grid[x][a] && grid[x][a].type === "tile"){
         yTiles.push(grid[x][a]);
         a++;
     }
@@ -48,30 +55,23 @@ var getVariables = function (grid, tile, x, y) {
     retVal.push({dimension: "x", tiles: xTiles});
     retVal.push({dimension: "y", tiles: yTiles});
 
-    for (var j = 0; j < retVal.length; j++) {
-        var tiles = retVal[j].tiles;
+    retVal.forEach(function(item){
         var colours = [], shapes = [], numbers = [];
-        var count = 0;
-        for (var i = 0; i < tiles.length; i++) {
-            count++;
-            if (colours.indexOf(tiles[i].colour) === -1) {
-                colours.push(tiles[i].colour)
-            }
-            if (shapes.indexOf(tiles[i].shape) === -1) {
-                shapes.push(tiles[i].shape)
-            }
-            if (numbers.indexOf(tiles[i].number) === -1) {
-                numbers.push(tiles[i].number)
-            }
-        }
-        retVal[j].colours = colours;
-        retVal[j].shapes = shapes;
-        retVal[j].numbers = numbers;
-        retVal[j].count = count;
-    }
+        var tiles = item.tiles;
+        tiles.forEach(function(tile){
+            colours.push(tile.colour);
+            shapes.push(tile.shape);
+            numbers.push(tile.number);
+        });
+
+        item.colours = unique(colours);
+        item.shapes = unique(shapes);
+        item.numbers = unique(numbers);
+        item.count = tiles.length;
+    });
 
     return retVal;
-};
+}
 
 var rulesAllValid = [];
 
@@ -202,4 +202,4 @@ function isValidMove(grid, newTile, x, y, tilesPlaced){
     });
 
     return  allValidCount === rulesAllValid.length && atLeastOneValidCountX >= 1 && atLeastOneValidCountY >= 1;
-};
+}

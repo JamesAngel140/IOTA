@@ -9,36 +9,27 @@ function getXYTiles(grid, x, y) {
     var xTiles = [];
     // start at x and go left
     var a = x - 1;
-    while (a > x - 3 && grid[a][y] && grid[a][y].type === "tile") {
-        //if (!grid[a][y].tileHistory) {
+    while (a > x - 4 && grid[a][y] && grid[a][y].type === "tile") {
         xTiles.push(grid[a][y]);
-        //}
         a--;
     }
     // start at x and go right
     a = x + 1;
-    while (a < x + 3 && grid[a][y] && grid[a][y].type === "tile") {
-        //if (!grid[a][y].tileHistory) {
+    while (a < x + 4 && grid[a][y] && grid[a][y].type === "tile") {
         xTiles.push(grid[a][y]);
-        //}
         a++;
     }
-
     var yTiles = [];
     // start at y and go up
     a = y - 1;
-    while (a > y - 3 && grid[x][a] && grid[x][a].type === "tile") {
-        //if (!grid[x][a].tileHistory) {
+    while (a > y - 4 && grid[x][a] && grid[x][a].type === "tile") {
         yTiles.push(grid[x][a]);
-        //}
         a--;
     }
     // start at y and go down
     a = y + 1;
-    while (a < y + 3 && grid[x][a] && grid[x][a].type === "tile") {
-        //if (!grid[x][a].tileHistory) {
+    while (a < y + 4 && grid[x][a] && grid[x][a].type === "tile") {
         yTiles.push(grid[x][a]);
-        //}
         a++;
     }
 
@@ -47,17 +38,22 @@ function getXYTiles(grid, x, y) {
 
 function calculateScore(originlGrid, originalTilesHistory) {
     var score = 0;
-    var grid = clone(originlGrid);
-    //var tilesHistory = clone(originalTilesHistory);
+    var grid = clone(originlGrid); // don't use the current grid because we mustn't change it
+    var doubleIt = 0;
+    var tilesHistory = [];
 
+    // if we have used all 4 tile double the core
+    if (originalTilesHistory.length === 4) {
+        doubleIt++;
+    }
+
+    // update the grid to mark all tile plces with tileHistory true
     originalTilesHistory.forEach(function (tmp) {
-        // tile.score = 0;
         tile = grid[tmp.x][tmp.y];
         tile.tileHistory = true;
     });
 
-    var tilesHistory = [];
-
+    // add some additional attributes to the tiles and build the tile history from the grid
     grid.forEach(function (row) {
         row.forEach(function (tile) {
             if (tile && tile.type === 'tile') {
@@ -72,37 +68,18 @@ function calculateScore(originlGrid, originalTilesHistory) {
 
     tilesHistory.forEach(function (hTile) {
         xyTiles = getXYTiles(grid, hTile.x, hTile.y);
-        //var scoreX = 0;
-        //var scoreY = 0;
 
         xyTiles.x.forEach(function (tile) {
-            //if (!tile.xScore) {
-            //scoreX += parseInt(tile.number);
             tile.xScore = parseInt(tile.number);
             hTile.xScore = parseInt(hTile.number);
-            //}
         });
 
         xyTiles.y.forEach(function (tile) {
-            //if (!tile.yScore) {
-            //scoreY += parseInt(tile.number);
             tile.yScore = parseInt(tile.number);
             hTile.yScore = parseInt(hTile.number);
-            //}
         });
-
-        //if (scoreX + scoreY !== 0) {
-        //hTile.score = parseInt(hTile.number) + scoreX + scoreY;
-        //}
     });
 
-    // if (tilesHistory.length === 1) {
-    //     score = tilesHistory[0].score;
-    // } else {
-    //     tilesHistory.forEach(function (tile) {
-    //         score += parseInt(tile.score) + parseInt(tile.number);
-    //     });
-    // }
     grid.forEach(function (row) {
         row.forEach(function (tile) {
             if (tile && tile.type === 'tile') {
@@ -112,10 +89,34 @@ function calculateScore(originlGrid, originalTilesHistory) {
         })
     });
 
-    // tilesHistory.forEach(function (tile) {
-    //     score += tile.xScore;
-    //     score += tile.yScore;
-    // });
+    // where we have scores count if we have a 4 in a row
+    for (var x = 0; x < size; x++) {
+        var test = 0;
+        for (var y = 0; y < size; y++) {
+            var tile = grid[x][y];
+            if (tile && tile.type === 'tile' && tile.yScore) {
+                test++;
+            }
+        }
+        if (test === 4) {
+            doubleIt++;
+        }
+    }
+    for (var y = 0; y < size; y++) {
+        var test = 0;
+        for (var x = 0; x < size; x++) {
+            var tile = grid[x][y];
+            if (tile && tile.type === 'tile' && tile.xScore) {
+                test++;
+            }
+        }
+        if (test === 4) {
+            doubleIt++;
+        }
+    }
 
+    for (var i = 0; i < doubleIt; i++) {
+        score = score * 2;
+    }
     return score;
 }

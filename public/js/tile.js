@@ -20,6 +20,16 @@ function createDeck() {
     return deck;
 }
 
+function removeFromDeck(deck, shape, colour, number){
+    for(var i = 0; i < deck.length; i++){
+        if(deck[i].shape === shape &&
+        deck[i].colour === colour &&
+        deck[i].number === number)
+            return deck.splice( i, 1 )[0];
+    }
+    return null; // not found
+}
+
 // The Fisher-Yates (aka Knuth) Shuffle.
 // See https://github.com/coolaj86/knuth-shuffle
 // You can see a great visualization here (and the original post linked to this)

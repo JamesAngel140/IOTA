@@ -31,10 +31,11 @@
 .target {
     width: var(--tileWidth);
     height: var(--tileWidth);
-    border: var(--tileBorderWidth) rgba(0,0,0,.5);
+    border: var(--tileBorderWidth) #f5f5f5;
     border-style: solid;
     margin: 1px;
-    background: lightgray;
+    background: #f5f5f5;
+    border-radius: 5px;
 }
 
 .targetSelected {
@@ -43,7 +44,8 @@
     border: var(--tileBorderWidth) red;
     border-style: solid;
     margin: 1px;
-    background: lightgray;
+    background: #ccc;
+    border-radius: 5px;
 }
 
 .tile {
@@ -54,6 +56,10 @@
     border-radius: 5px;
     margin: 1px;
     box-shadow: 5px 5px 2px #888888;
+}
+
+.tilePlaced {
+    background-color: lightyellow;
 }
 
 .tileInner {
@@ -106,4 +112,35 @@
     position: absolute;
     top: 15px;
     width: var(--shapeWidth);
+}
+
+.panel {
+    min-width: var(--tileWidth);
+    height: var(--tileWidth);
+    border: var(--tileBorderWidth) black;
+    border-style: solid;
+    border-radius: 5px;
+    margin: 1px;
+    box-shadow: 5px 5px 2px #888888;
+    text-align: center;
+    font-weight: bold;
+    /*
+    font-size: var(--fontSize);
+    */
+}
+
+.panel-body {
+    padding: 0px 0px 0px 2px;
+    padding-top: 10px;
+    font-size: var(--fontSize);
+}
+
+.panel-success>.panel-heading {
+    color: white;
+    background-color: green;
+}
+
+.panel-default>.panel-heading {
+    color: white;
+    background-color: gray;
 }

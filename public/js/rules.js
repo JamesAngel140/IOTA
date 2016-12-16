@@ -98,6 +98,20 @@ var ruleNextToTile = function (grid, tile, x, y) {
 };
 rulesAllValid.push(ruleNextToTile);
 
+var ruleNextToHistoryTile = function (grid, tile, x, y, previousTiles) {
+    if(previousTiles.length === 0){
+        return 1;
+    }
+    var valid = false;
+    for(var i = 0; i < previousTiles.length; i++){
+        if(Math.abs(x - previousTiles[i].x) === 1 && (Math.abs(y - previousTiles[i].y) === 1)){
+            valid = true;
+        }
+    }
+    return valid;
+};
+rulesAllValid.push(ruleNextToHistoryTile);
+
 var ruleNewTileInALine = function (grid, tile, x, y, previousTiles) {
     var tiles = previousTiles.map(function(item){return item}); // copy list
     tile.x = x;

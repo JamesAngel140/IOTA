@@ -29,6 +29,7 @@ $(document).ready(function () {
             }
         }
     }
+
     function addBlanksAroundTile(grid, x, y) {
         var size = 2;
         for (var a = x - size; a <= x + size; a++) {
@@ -39,6 +40,7 @@ $(document).ready(function () {
             }
         }
     }
+
     function addTargetsToGrid(grid) {
         for (var x = 0; x < grid.length; x++) {
             for (var y = 0; y < grid[x].length; y++) {
@@ -48,6 +50,7 @@ $(document).ready(function () {
             }
         }
     }
+
     function addBlanksToGrid(grid) {
         for (var x = 0; x < grid.length; x++) {
             for (var y = 0; y < grid[x].length; y++) {
@@ -62,6 +65,7 @@ $(document).ready(function () {
             }
         }
     }
+
     function getUser(users, name) {
         for (var i = 0; i < users.length; i++) {
             if (users[i].name === name) {
@@ -82,12 +86,12 @@ $(document).ready(function () {
             $("#swapSpan").show();
         }
 
-        if(users.length) {
+        if (users.length) {
             var html = usersToHtml(users);
             $("#users").html(html);
 
             var user = getUser(users, name);
-            if(user) {
+            if (user) {
                 if (user.turn) {
                     addTargetsToGrid(grid);
                     $("#end").show();
@@ -146,20 +150,23 @@ $(document).ready(function () {
             $("#users").html(html);
         }
     }
+
     function tileClick(e) {
-        if (handIndex !== -1 && !$('#swap').prop('checked')) {
+        var swapping = $('#swap').prop('checked');
+        if (handIndex !== -1 && !swapping) {
             $('.tile').removeClass("targetSelected");
         }
         var y = $(this).attr("data-y");
         y = parseInt(y);
+        console.log("tile index", y);
 
         handIndex = y;
         var user = getUser(users, name);
-        user.swap.push(user.hand[handIndex]);
-        console.log("tile index", y);
-        $(this).addClass("targetSelected");
 
-        var user = getUser(users, name);
+        if (swapping) {
+            user.swap.push(user.hand[handIndex]);
+        }
+        $(this).addClass("targetSelected");
 
         // tbd - this needs to be selected with a help button
         addTargetsToGrid(grid);
@@ -187,7 +194,7 @@ $(document).ready(function () {
     $("#undo").click(undoClick);
 
     function resetClick(e) {
-        getGrid();
+        init();
     }
     $("#reset").click(resetClick);
 
@@ -201,7 +208,7 @@ $(document).ready(function () {
             user: user
         };
 
-        tilesPlaced.forEach(function(tile){
+        tilesPlaced.forEach(function (tile) {
             data.grid[tile.x][tile.y].placed = true;
         });
 
@@ -226,7 +233,7 @@ $(document).ready(function () {
     }
     $("#end").click(endClick);
 
-    function resume(){
+    function resume() {
         $("#resume").hide();
         init();
     }
@@ -237,7 +244,7 @@ $(document).ready(function () {
         var duration = 3; // in seconds
         $("#resume").hide();
         var timer = setInterval(function () {
-            if(count++ > 120/duration){
+            if (count++ > 120 / duration) {
                 clearInterval(timer); // and stop
                 $("#resume").show();
             }
@@ -247,7 +254,7 @@ $(document).ready(function () {
                 contentType: 'application/json',
                 url: '/' + key + '/' + name + '/users',
                 success: function (result, status, xhr) {
-                    if(JSON.stringify(users) !== result) {
+                    if (JSON.stringify(users) !== result) {
                         clearInterval(timer);
                         init();
                     }
@@ -255,13 +262,12 @@ $(document).ready(function () {
             });
         }, duration * 1000);
     }
-
     function init() {
         history = [];
         tilesPlaced = [];
         handIndex = -1;
 
-        $.when(getGrid(), getUsers()).then(function(){
+        $.when(getGrid(), getUsers()).then(function () {
             addBlanksToGrid(grid);
             buildDesktop(grid, users);
 
@@ -309,74 +315,75 @@ $(document).ready(function () {
     // }
     // buildDesktop(grid, []);
     // code for checked buttons
-        $('.button-checkbox').each(function () {
+    $('.button-checkbox').each(function () {
 
-            // Settings
-            var $widget = $(this),
-                $button = $widget.find('button'),
-                $checkbox = $widget.find('input:checkbox'),
-                color = $button.data('color'),
-                settings = {
-                    on: {
-                        icon: 'glyphicon glyphicon-check'
-                    },
-                    off: {
-                        icon: 'glyphicon glyphicon-unchecked'
-                    }
-                };
-
-            // Event Handlers
-            $button.on('click', function () {
-                $checkbox.prop('checked', !$checkbox.is(':checked'));
-                $checkbox.triggerHandler('change');
-                updateDisplay();
-            });
-            $checkbox.on('change', function () {
-                updateDisplay();
-            });
-
-            // Actions
-            function updateDisplay() {
-                // reset selection and swap hand
-                $('.tile').removeClass("targetSelected");
-                if(users) {
-                    var user = getUser(users, name);
-                    user.swap = [];
+        // Settings
+        var $widget = $(this),
+            $button = $widget.find('button'),
+            $checkbox = $widget.find('input:checkbox'),
+            color = $button.data('color'),
+            settings = {
+                on: {
+                    icon: 'glyphicon glyphicon-check'
+                },
+                off: {
+                    icon: 'glyphicon glyphicon-unchecked'
                 }
+            };
 
-                var isChecked = $checkbox.is(':checked');
-
-                // Set the button's state
-                $button.data('state', (isChecked) ? "on" : "off");
-
-                // Set the button's icon
-                $button.find('.state-icon')
-                    .removeClass()
-                    .addClass('state-icon ' + settings[$button.data('state')].icon);
-
-                // Update the button's color
-                if (isChecked) {
-                    $button
-                        .removeClass('btn-default')
-                        .addClass('btn-' + color + ' active');
-                }
-                else {
-                    $button
-                        .removeClass('btn-' + color + ' active')
-                        .addClass('btn-default');
-                }
-            }
-
-            // Initialization
-            function setUpCheckboxes() {
-
-                updateDisplay();
-
-                // Inject the icon if applicable
-                if ($button.find('.state-icon').length == 0) {
-                    $button.prepend('<i class="state-icon ' + settings[$button.data('state')].icon + '"></i> ');
-                }
-            }
-            setUpCheckboxes();
+        // Event Handlers
+        $button.on('click', function () {
+            $checkbox.prop('checked', !$checkbox.is(':checked'));
+            $checkbox.triggerHandler('change');
+            updateDisplay();
         });
+        $checkbox.on('change', function () {
+            updateDisplay();
+        });
+
+        // Actions
+        function updateDisplay() {
+            // reset selection and swap hand
+            $('.tile').removeClass("targetSelected");
+            if (users) {
+                var user = getUser(users, name);
+                user.swap = [];
+            }
+
+            var isChecked = $checkbox.is(':checked');
+
+            // Set the button's state
+            $button.data('state', (isChecked) ? "on" : "off");
+
+            // Set the button's icon
+            $button.find('.state-icon')
+                .removeClass()
+                .addClass('state-icon ' + settings[$button.data('state')].icon);
+
+            // Update the button's color
+            if (isChecked) {
+                $button
+                    .removeClass('btn-default')
+                    .addClass('btn-' + color + ' active');
+            }
+            else {
+                $button
+                    .removeClass('btn-' + color + ' active')
+                    .addClass('btn-default');
+            }
+        }
+
+        // Initialization
+        function setUpCheckboxes() {
+
+            updateDisplay();
+
+            // Inject the icon if applicable
+            if ($button.find('.state-icon').length == 0) {
+                $button.prepend('<i class="state-icon ' + settings[$button.data('state')].icon + '"></i> ');
+            }
+        }
+
+        setUpCheckboxes();
+    });
 });

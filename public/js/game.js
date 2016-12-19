@@ -191,11 +191,13 @@ $(document).ready(function () {
             buildDesktop(grid, users);
         }
     }
+
     $("#undo").click(undoClick);
 
     function resetClick(e) {
         init();
     }
+
     $("#reset").click(resetClick);
 
     function endClick(e) {
@@ -231,12 +233,14 @@ $(document).ready(function () {
             }
         });
     }
+
     $("#end").click(endClick);
 
     function resume() {
         $("#resume").hide();
         init();
     }
+
     $("#resume").click(resume);
 
     function poll() {
@@ -262,11 +266,14 @@ $(document).ready(function () {
             });
         }, duration * 1000);
     }
+
     function init() {
         history = [];
         tilesPlaced = [];
         handIndex = -1;
-
+        $('#swap').prop('checked', false);
+        $('#swap').triggerHandler('change');
+        
         $.when(getGrid(), getUsers()).then(function () {
             addBlanksToGrid(grid);
             buildDesktop(grid, users);
@@ -288,6 +295,7 @@ $(document).ready(function () {
             }
         });
     }
+
     function getUsers() {
         return $.ajax({
             type: 'GET',
@@ -344,13 +352,13 @@ $(document).ready(function () {
         // Actions
         function updateDisplay() {
             // reset selection and swap hand
+            var isChecked = $checkbox.is(':checked');
+
             $('.tile').removeClass("targetSelected");
             if (users) {
                 var user = getUser(users, name);
                 user.swap = [];
             }
-
-            var isChecked = $checkbox.is(':checked');
 
             // Set the button's state
             $button.data('state', (isChecked) ? "on" : "off");

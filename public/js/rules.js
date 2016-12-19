@@ -104,10 +104,11 @@ var ruleNextToHistoryTile = function (grid, tile, x, y, previousTiles) {
     }
     var valid = false;
     for(var i = 0; i < previousTiles.length; i++){
-        if(Math.abs(x - previousTiles[i].x) === 1 && (Math.abs(y - previousTiles[i].y) === 1)){
+        if(Math.abs(x - previousTiles[i].x) <= 1 && (Math.abs(y - previousTiles[i].y) <= 1)){
             valid = true;
         }
     }
+    console.log("ruleNextToHistoryTile", valid);
     return valid;
 };
 rulesAllValid.push(ruleNextToHistoryTile);

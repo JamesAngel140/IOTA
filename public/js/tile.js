@@ -25,7 +25,9 @@ function removeFromDeck(deck, shape, colour, number){
         if(deck[i].shape === shape &&
         deck[i].colour === colour &&
         deck[i].number === number)
-            return deck.splice( i, 1 )[0];
+            //return deck.splice( i, 1 )[0];
+           return deck[i];
+
     }
     return null; // not found
 }

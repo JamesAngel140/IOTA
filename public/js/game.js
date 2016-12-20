@@ -72,6 +72,7 @@ $(document).ready(function () {
     }
 
     function buildDesktop(grid, users) {
+        $("#rule").show()
         if (history.length) {
             $("#undo").show();
             $("#reset").show();

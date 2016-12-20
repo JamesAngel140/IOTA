@@ -313,7 +313,7 @@ function GameManager() {
         // deal hands
         var deck = this.deck; // temp var for the function below
         this.userManager.forAllUsers(function (user) {
-            user.hand = dealHand(deck);
+            user.hand = dealFirstHand(deck);
         });
 
         var user = this.userManager.getFirstTurnUser();
@@ -334,10 +334,10 @@ function GameManager() {
             console.log("User ", name, " is not their turn");
             return false; // not the users turn
         }
-        var tmpDeck = this.deck;
+        var deck = this.deck; // temp var for the function below
         user.swap.forEach(function(tile){
             // put swapped tile to the end of the deck
-            tmpDeck.unshift(tile);
+            deck.unshift(tile);
             // take the tile out of the hand
             user.hand.forEach(function(handTile, index, arr){
                 if(JSON.stringify(handTile) === JSON.stringify(tile)){
@@ -408,7 +408,7 @@ function shuffle(array) {
 
     return array;
 }
-function dealHand(deck) {
+function dealFirstHand(deck) {
     var hand = [];
 
     for (var i = 0; i < 4; i++) {
@@ -419,7 +419,7 @@ function dealHand(deck) {
 function refreshHand(hand, deck) {
 
     for (var i = 0; i < 4; i++) {
-        if (!hand[i]) {
+        if (hand[i] === null) {
             hand[i] = deck.pop();
         }
     }

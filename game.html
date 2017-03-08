@@ -27,14 +27,14 @@
                 </tr>
                 <tr>
                     <th colspan="2" id="buttons" style="padding-top: 7px;">
-                        <span class="button-checkbox" id="swapSpan">
+                        <span class="button-checkbox end" id="swapSpan">
                             <button type="button" class="btn" data-color="warning">Swap Cards</button>
                             <input id="swap" type="checkbox" class="hidden"/>
                         </span>
-                        <button id="undo" type="button" style="display:none" class="btn btn-success">Undo</button>
-                        <button id="reset" type="button" style="display:none" class="btn btn-warning">Reset</button>
-                        <button id="end" type="button" style="display:none" class="btn btn-primary">End Turn</button>
-                        <button id="resume" type="button" style="display:none" class="btn btn-danger">Resume</button>
+                        <button id="undo" type="button" style="display:none" class="btn btn-success end">Undo</button>
+                        <button id="reset" type="button" style="display:none" class="btn btn-warning end">Reset</button>
+                        <button id="end" type="button" style="display:none" class="btn btn-primary end">End Turn</button>
+                        <button id="resume" type="button" style="display:none" class="btn btn-danger end">Resume</button>
                     </th>
                 </tr>
             </table>
@@ -42,6 +42,8 @@
         </div>
     </nav>
     <div class="container" style="padding-top:130px">
+        <div id="winner" class="alert alert-success" role="alert" style="display:none"></div>
+        <div id="loser" class="alert alert-warning" role="alert" style="display:none"></div>
         <div id="grid"></div>
     </div>
 </div>

@@ -132,7 +132,7 @@ app.post('/startGame/:key', function (req, res) {
 
 // game public interface
 app.get('/:key/:name/users', function (req, res) {
-    console.log('users');
+    //console.log('users');
 
     // get the users for a particular game key
     var key = req.params.key;
@@ -172,7 +172,7 @@ app.get('/:key/:name/user', function (req, res) {
     res.send(message);
 });
 app.get('/:key/:name/grid', function (req, res) {
-    console.log('grid');
+    //console.log('grid');
 
     // get the users for a particular game key
     var key = req.params.key;
@@ -249,6 +249,8 @@ function User(name) {
     this.score = 0;
     this.delta = 0;
     this.turn = false;
+    // for the end of the game
+    this.winner = false;
 }
 function UserManager() {
     this.users = [];
@@ -349,6 +351,11 @@ function GameManager() {
         user.hand = refreshHand(user.hand, this.deck);
         // now handle the turn logic
         user.turn = false;
+        // check for end of the game
+        if(user.hand.length === 0 && this.deck.length === 0) {
+            // this needs updating to the actual winner
+            user.winner = true;
+        }
         this.userManager.getNextUser(name).turn = true;
 
         return true;
@@ -434,22 +441,30 @@ var appEnv = cfenv.getAppEnv();
 
 // always create a game for testing
 function createTestGame(){
-    var key = '0000';
-    global[key] = {};
-    global[key].gameManager = new GameManager();
-    global[key].gameManager.userManager.createUser('James');
-    global[key].gameManager.userManager.createUser('Sam');
-    global[key].gameManager.userManager.createUser('Emily');
-    global[key].gameManager.start('James');
+    var keys = ['0000', '0001'];
+    
+    keys.forEach(function(key) {
+        global[key] = {};
+        global[key].gameManager = new GameManager();
+        global[key].gameManager.userManager.createUser('James');
+        global[key].gameManager.userManager.createUser('Sam');
+        global[key].gameManager.userManager.createUser('Emily');
+        global[key].gameManager.userManager.createUser('Gill');
+        global[key].gameManager.start('James');
 
-    // force the turn to James
-    global[key].gameManager.userManager.getUser('James').turn = true;
-    global[key].gameManager.userManager.getUser('Sam').turn = false;
-    global[key].gameManager.userManager.getUser('Emily').turn = false;
+        // force the turn to James
+        global[key].gameManager.userManager.getUser('James').turn = true;
+        global[key].gameManager.userManager.getUser('Sam').turn = false;
+        global[key].gameManager.userManager.getUser('Emily').turn = false;
+        global[key].gameManager.userManager.getUser('Gill').turn = false;
 
-    configureNewPaths('James', key);
-    configureNewPaths('Sam', key);
-    configureNewPaths('Emily', key);
+        configureNewPaths('James', key);
+        configureNewPaths('Sam', key);
+        configureNewPaths('Emily', key);
+        configureNewPaths('Gill', key);
+    });
+
+    global[keys[1]].gameManager.userManager.getUser('James').winner = true;
 }
 createTestGame();
 

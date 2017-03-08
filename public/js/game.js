@@ -1,10 +1,6 @@
 /**
  * Created by james on 26/11/2016.
  */
-
-/**
- * Created by James on 06/11/2016.
- */
 $(document).ready(function () {
     var key = null;
     var name = null;
@@ -76,7 +72,7 @@ $(document).ready(function () {
     }
 
     function buildDesktop(grid, users) {
-        $("#rule").show()
+        $("#rule").show();
         if (history.length) {
             $("#undo").show();
             $("#reset").show();
@@ -106,6 +102,18 @@ $(document).ready(function () {
                     $('#hand .tile').click(tileClick);
                 }
             }
+            // check to see if anyone has won
+            users.forEach(function(player){
+               if(player.winner){
+                   if(player.name === user.name){
+                       $('#winner').html("<strong>Well done " + user.name + "!</strong> You are the winner.").show();
+                   } else {
+                       $('#loser').html("<strong>Unlucky " + user.name + "!</strong> You lost out to " + player.name + ".").show();
+                   }
+                   // hide all of the game buttons
+                   $('.end').hide();
+               }
+            });
         }
 
         $("#grid").html(gridToHtml(grid));
@@ -311,79 +319,79 @@ $(document).ready(function () {
         });
     }
 
-    //init();
-
     // temp code for building grid to test
-    grid = createGrid();
-    var deck = createDeck();
-    var x=32, y=32;
-    grid[x++][y] = removeFromDeck(deck, "circle", "red", "1");
-    grid[x++][y] = removeFromDeck(deck, "circle", "red", "2");
-    grid[x++][y] = removeFromDeck(deck, "circle", "red", "3");
-    grid[x++][y] = removeFromDeck(deck, "circle", "red", "4");
+    function test() {
+        grid = createGrid();
+        var deck = createDeck();
+        var x = 32, y = 32;
+        grid[x++][y] = removeFromDeck(deck, "circle", "red", "1");
+        grid[x++][y] = removeFromDeck(deck, "circle", "red", "2");
+        grid[x++][y] = removeFromDeck(deck, "circle", "red", "3");
+        grid[x++][y] = removeFromDeck(deck, "circle", "red", "4");
 
-    addBlanksAroundTile(grid, x, y++);
-    x=32;
-    y++;
+        addBlanksAroundTile(grid, x, y++);
+        x = 32;
+        y++;
 
-    grid[x++][y] = removeFromDeck(deck, "circle", "green", "1");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "green", "1");
-    grid[x++][y] = removeFromDeck(deck, "square", "green", "1");
-    grid[x++][y] = removeFromDeck(deck, "cross", "green", "1");
+        grid[x++][y] = removeFromDeck(deck, "circle", "green", "1");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "green", "1");
+        grid[x++][y] = removeFromDeck(deck, "square", "green", "1");
+        grid[x++][y] = removeFromDeck(deck, "cross", "green", "1");
 
-    addBlanksAroundTile(grid, x, y++);
-    x=32;
-    y++;
+        addBlanksAroundTile(grid, x, y++);
+        x = 32;
+        y++;
 
-    grid[x++][y] = removeFromDeck(deck, "triangle", "red", "2");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "green", "2");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "blue", "2");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "yellow", "2");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "red", "2");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "green", "2");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "blue", "2");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "yellow", "2");
 
-    addBlanksAroundTile(grid, x, y++);
-    x=32;
-    y++;
+        addBlanksAroundTile(grid, x, y++);
+        x = 32;
+        y++;
 
-    grid[x++][y] = removeFromDeck(deck, "triangle", "red", "1");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "green", "2");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "blue", "3");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "yellow", "4");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "red", "1");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "green", "2");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "blue", "3");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "yellow", "4");
 
-    addBlanksAroundTile(grid, x, y++);
-    x=32;
-    y++;
+        addBlanksAroundTile(grid, x, y++);
+        x = 32;
+        y++;
 
-    grid[x++][y] = removeFromDeck(deck, "circle", "blue", "1");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "blue", "2");
-    grid[x++][y] = removeFromDeck(deck, "square", "blue", "3");
-    grid[x++][y] = removeFromDeck(deck, "cross", "blue", "4");
+        grid[x++][y] = removeFromDeck(deck, "circle", "blue", "1");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "blue", "2");
+        grid[x++][y] = removeFromDeck(deck, "square", "blue", "3");
+        grid[x++][y] = removeFromDeck(deck, "cross", "blue", "4");
 
-    addBlanksAroundTile(grid, x, y++);
-    x=32;
-    y++;
+        addBlanksAroundTile(grid, x, y++);
+        x = 32;
+        y++;
 
-    grid[x++][y] = removeFromDeck(deck, "circle", "red", "3");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "green", "3");
-    grid[x++][y] = removeFromDeck(deck, "square", "blue", "3");
-    grid[x++][y] = removeFromDeck(deck, "cross", "yellow", "3");
+        grid[x++][y] = removeFromDeck(deck, "circle", "red", "3");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "green", "3");
+        grid[x++][y] = removeFromDeck(deck, "square", "blue", "3");
+        grid[x++][y] = removeFromDeck(deck, "cross", "yellow", "3");
 
-    addBlanksAroundTile(grid, x, y++);
-    x=32;
-    y++;
+        addBlanksAroundTile(grid, x, y++);
+        x = 32;
+        y++;
 
-    grid[x++][y] = removeFromDeck(deck, "circle", "red", "1");
-    grid[x++][y] = removeFromDeck(deck, "triangle", "green", "2");
-    grid[x++][y] = removeFromDeck(deck, "square", "blue", "3");
-    grid[x++][y] = removeFromDeck(deck, "cross", "yellow", "4");
+        grid[x++][y] = removeFromDeck(deck, "circle", "red", "1");
+        grid[x++][y] = removeFromDeck(deck, "triangle", "green", "2");
+        grid[x++][y] = removeFromDeck(deck, "square", "blue", "3");
+        grid[x++][y] = removeFromDeck(deck, "cross", "yellow", "4");
 
-    addBlanksAroundTile(grid, x, y++);
+        addBlanksAroundTile(grid, x, y++);
 
-    // var tile = removeFromDeck(deck, "circle", "red", "4");
-    // var validMove = isValidMove(grid, tile, 32, 35, []);
-    // if(validMove) {
-    //     grid[32][35] = tile;
-    // }
-    buildDesktop(grid, []);
+        // var tile = removeFromDeck(deck, "circle", "red", "4");
+        // var validMove = isValidMove(grid, tile, 32, 35, []);
+        // if(validMove) {
+        //     grid[32][35] = tile;
+        // }
+        buildDesktop(grid, []);
+    };
 
     // code for checked buttons
     $('.button-checkbox').each(function () {
@@ -457,4 +465,6 @@ $(document).ready(function () {
 
         setUpCheckboxes();
     });
+
+    init();
 });
